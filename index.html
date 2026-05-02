@@ -229,126 +229,153 @@
                 </div>
             </div>
 
-            <!-- SECTION D: CAPACITY BUILDING -->
+            <!-- SECTION D: CAPACITY BUILDING (WITH GATE QUESTION) -->
             <div class="form-section" style="border-top-color: #8b5cf6;">
                 <h2 class="text-purple-700 font-black text-sm mb-4">SECTION D: CAPACITY BUILDING</h2>
                 
-                <!-- Specific training field (ADDED) -->
-                <div class="mb-4">
-                    <label class="label-text">Specific training</label>
-                    <div class="checkbox-group" id="specificTrainingCheckboxes">
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Soft Skills"> Soft Skills</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Employability"> Employability</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Entrepreneurship"> Entrepreneurship</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Digital Literacy"> Digital Literacy</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Customer Service in Hospitality"> Customer Service in Hospitality</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="General Customer Service"> General Customer Service</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Financial Literacy"> Financial Literacy</label>
-                        <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Other Specify" onchange="checkOtherSpecificTraining(this)"> Other Specify</label>
+                <!-- GATE QUESTION -->
+                <div class="bg-purple-50 p-3 rounded mb-4">
+                    <label class="label-text">Has participant been trained by partner?</label>
+                    <div class="flex gap-4 mt-1">
+                        <label class="text-xs font-bold cursor-pointer">
+                            <input type="radio" name="tr_check" value="Yes" onclick="toggleBlock('tr_logic', true)"> YES
+                        </label>
+                        <label class="text-xs font-bold cursor-pointer">
+                            <input type="radio" name="tr_check" value="No" onclick="toggleBlock('tr_logic', false)" checked> NO
+                        </label>
                     </div>
                 </div>
+                
+                <!-- CONDITIONAL FIELDS (Hidden by default) -->
+                <div id="tr_logic" class="conditional-box">
+                    <!-- Specific training field -->
+                    <div class="mb-4">
+                        <label class="label-text">Specific training</label>
+                        <div class="checkbox-group" id="specificTrainingCheckboxes">
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Soft Skills"> Soft Skills</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Employability"> Employability</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Entrepreneurship"> Entrepreneurship</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Digital Literacy"> Digital Literacy</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Customer Service in Hospitality"> Customer Service in Hospitality</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="General Customer Service"> General Customer Service</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Financial Literacy"> Financial Literacy</label>
+                            <label class="checkbox-item"><input type="checkbox" name="specificTraining" value="Other Specify" onchange="checkOtherSpecificTraining(this)"> Other Specify</label>
+                        </div>
+                    </div>
 
-                <!-- Technical Training question (ADDED) -->
-                <div class="mb-4">
-                    <label class="label-text required">Have you had any sector specific training Technical Training?</label>
-                    <select id="technicalTraining" class="input-box" required onchange="toggleTechnicalTrainingFields()">
-                        <option value="">Select</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
-                </div>
+                    <!-- Technical Training question -->
+                    <div class="mb-4">
+                        <label class="label-text required">Have you had any sector specific training Technical Training?</label>
+                        <select id="technicalTraining" class="input-box" required onchange="toggleTechnicalTrainingFields()">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
 
-                <!-- Sector training and Module fields (conditional) -->
-                <div id="technicalTrainingFields" class="conditional-box">
+                    <!-- Sector training and Module fields (conditional) -->
+                    <div id="technicalTrainingFields" class="conditional-box">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div><label class="label-text required">Sector of Training</label><select id="trSector" class="input-box" onchange="updateSubs('trSector', 'trSub')"></select></div>
+                            <div><label class="label-text required">Module/Sub-Sector</label><select id="trSub" class="input-box" disabled></select></div>
+                        </div>
+                    </div>
+
+                    <!-- Desired trainings question -->
+                    <div class="mb-4">
+                        <label class="label-text">Do you want any specific trainings?</label>
+                        <select id="wantSpecificTrainings" class="input-box" onchange="checkWantSpecificTrainings()">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <!-- Training dates and partner -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div><label class="label-text">Start Date</label><input type="date" id="trStart" class="input-box"></div>
+                        <div><label class="label-text">End Date</label><input type="date" id="trEnd" class="input-box"></div>
+                        <div class="md:col-span-2">
+                            <label class="label-text">Training locations</label>
+                            <input type="text" id="trainingLocations" class="input-box" placeholder="Exact venue and location as in town/community">
+                        </div>
+                    </div>
+
+                    <!-- Training partner field -->
+                    <div class="mb-4">
+                        <label class="label-text">Training partner</label>
+                        <div class="checkbox-group" id="trainingPartnerCheckboxes">
+                            <label class="checkbox-item"><input type="checkbox" name="trainingPartner" value="Jobberman Ghana" checked onchange="updateTrainerType()"> Jobberman Ghana (default)</label>
+                            <label class="checkbox-item"><input type="checkbox" name="trainingPartner" value="Other Specify" onchange="checkOtherPartner(this); updateTrainerType()"> Other Specify</label>
+                        </div>
+                    </div>
+
+                    <!-- Trainer type (AUTO-POPULATED, READ-ONLY) -->
+                    <div class="mb-4">
+                        <label class="label-text">Trainer type</label>
+                        <input type="text" id="trainerType" class="input-box auto-field" readonly placeholder="Auto-populated based on Training partner">
+                    </div>
+
+                    <!-- Training mode -->
+                    <div class="mb-4">
+                        <label class="label-text">Training mode</label>
+                        <select id="trainingMode" class="input-box" onchange="checkTrainingMode()">
+                            <option value="">Select</option>
+                            <option value="In-person">In-person</option>
+                            <option value="Virtual">Virtual</option>
+                        </select>
+                    </div>
+
+                    <!-- Certificate and IT training questions -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div><label class="label-text required">Sector of Training</label><select id="trSector" class="input-box" onchange="updateSubs('trSector', 'trSub')"></select></div>
-                        <div><label class="label-text required">Module/Sub-Sector</label><select id="trSub" class="input-box" disabled></select></div>
+                        <div>
+                            <label class="label-text">Was a certificate provided after the training?</label>
+                            <select id="certificateProvided" class="input-box">
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label-text">Any special IT training conducted?</label>
+                            <select id="specialITTraining" class="input-box" onchange="checkSpecialITTraining()">
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Desired trainings question (ADDED) -->
-                <div class="mb-4">
-                    <label class="label-text">Do you want any specific trainings?</label>
-                    <select id="wantSpecificTrainings" class="input-box" onchange="checkWantSpecificTrainings()">
-                        <option value="">Select</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
+                    <!-- Hidden fields for modal data persistence -->
+                    <input type="hidden" id="modalOtherTrainingName">
+                    <input type="hidden" id="modalWhichTrainingsWant">
+                    <input type="hidden" id="modalOtherPartnerNames">
+                    <input type="hidden" id="modalVirtualPlatforms">
+                    <input type="hidden" id="modalOtherVirtualPlatform">
+                    <input type="hidden" id="modalITTrainingsList">
+                    <input type="hidden" id="modalOtherITTraining">
                 </div>
-
-                <!-- Training dates and partner -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div><label class="label-text">Start Date</label><input type="date" id="trStart" class="input-box"></div>
-                    <div><label class="label-text">End Date</label><input type="date" id="trEnd" class="input-box"></div>
-                    <!-- Training locations field (ADDED) -->
-                    <div class="md:col-span-2">
-                        <label class="label-text">Training locations</label>
-                        <input type="text" id="trainingLocations" class="input-box" placeholder="Exact venue and location as in town/community">
-                    </div>
-                </div>
-
-                <!-- Training partner field (ADDED with default) -->
-                <div class="mb-4">
-                    <label class="label-text">Training partner</label>
-                    <div class="checkbox-group" id="trainingPartnerCheckboxes">
-                        <label class="checkbox-item"><input type="checkbox" name="trainingPartner" value="Jobberman Ghana" checked onchange="updateTrainerType()"> Jobberman Ghana (default)</label>
-                        <label class="checkbox-item"><input type="checkbox" name="trainingPartner" value="Other Specify" onchange="checkOtherPartner(this); updateTrainerType()"> Other Specify</label>
-                    </div>
-                </div>
-
-                <!-- Trainer type (AUTO-POPULATED, READ-ONLY) -->
-                <div class="mb-4">
-                    <label class="label-text">Trainer type</label>
-                    <input type="text" id="trainerType" class="input-box auto-field" readonly placeholder="Auto-populated based on Training partner">
-                </div>
-
-                <!-- Training mode and virtual platform (ADDED) -->
-                <div class="mb-4">
-                    <label class="label-text">Training mode</label>
-                    <select id="trainingMode" class="input-box" onchange="checkTrainingMode()">
-                        <option value="">Select</option>
-                        <option value="In-person">In-person</option>
-                        <option value="Virtual">Virtual</option>
-                    </select>
-                </div>
-
-                <!-- Certificate and IT training questions (ADDED) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="label-text">Was a certificate provided after the training?</label>
-                        <select id="certificateProvided" class="input-box">
-                            <option value="">Select</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label-text">Any special IT training conducted?</label>
-                        <select id="specialITTraining" class="input-box" onchange="checkSpecialITTraining()">
-                            <option value="">Select</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Hidden fields for modal data persistence -->
-                <input type="hidden" id="modalOtherTrainingName">
-                <input type="hidden" id="modalWhichTrainingsWant">
-                <input type="hidden" id="modalOtherPartnerNames">
-                <input type="hidden" id="modalVirtualPlatforms">
-                <input type="hidden" id="modalOtherVirtualPlatform">
-                <input type="hidden" id="modalITTrainingsList">
-                <input type="hidden" id="modalOtherITTraining">
-                <input type="hidden" id="modalDisplacedCommunityOrigin">
-                <input type="hidden" id="modalDisplacedHostCommunity">
             </div>
 
-            <!-- SECTION E: PARTNER PLACEMENT -->
+            <!-- SECTION E: PARTNER PLACEMENT (WITH GATE QUESTION) -->
             <div class="form-section" style="border-top-color: #10b981;">
                 <h2 class="text-emerald-700 font-black text-sm mb-4">SECTION E: PARTNER PLACEMENT</h2>
                 
-                <div id="pl_logic" class="show">
+                <!-- GATE QUESTION -->
+                <div class="bg-emerald-50 p-3 rounded mb-4">
+                    <label class="label-text">Was participant placed in a job?</label>
+                    <div class="flex gap-4 mt-1">
+                        <label class="text-xs font-bold cursor-pointer">
+                            <input type="radio" name="pl_check" value="Yes" onclick="toggleBlock('pl_logic', true)"> YES
+                        </label>
+                        <label class="text-xs font-bold cursor-pointer">
+                            <input type="radio" name="pl_check" value="No" onclick="toggleBlock('pl_logic', false)" checked> NO
+                        </label>
+                    </div>
+                </div>
+
+                <!-- CONDITIONAL FIELDS (Hidden by default) -->
+                <div id="pl_logic" class="conditional-box">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div><label class="label-text required">Sector</label><select id="plSector" class="input-box" onchange="updateSubs('plSector','plSub')"></select></div>
                         <div><label class="label-text required">Industry/Sub</label><select id="plSub" class="input-box" disabled></select></div>
