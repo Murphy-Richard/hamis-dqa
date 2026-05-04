@@ -1,382 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#4F46E5">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>HAPPY Program - Jobberman</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-* { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { overscroll-behavior: none; }
-.form-section { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); }
-.input-field { transition: all 0.2s ease; }
-.input-field:focus { box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); }
-.input-field[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; }
-.tab-active { background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: white; }
-.required::after { content: ' *'; color: #ef4444; }
-.field-group { background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #e2e8f0; }
-.field-group-title { font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-.col-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #3b82f6; color: white; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 700; }
-.auto-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #10b981; color: white; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 700; }
-.capacity-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #9333ea; color: white; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 700; }
-.placement-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #4F46E5; color: white; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 700; }
-.toast { animation: slideIn 0.3s ease-out; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.online-status { position: fixed; top: 0; left: 0; right: 0; padding: 0.5rem; text-align: center; font-size: 0.75rem; display: none; z-index: 1000; }
-.online-status.online { background: #4F46E5; color: white; }
-.online-status.offline { background: #ef4444; color: white; }
-.login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-.spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4F46E5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.developer-signature { position: fixed; bottom: 8px; right: 12px; font-size: 0.6rem; color: #94a3b8; opacity: 0.7; z-index: 999; pointer-events: none; }
-@media (max-width: 640px) {
-  .container { padding-left: 0.75rem; padding-right: 0.75rem; }
-  .field-group { padding: 0.75rem; }
-  .developer-signature { bottom: 4px; right: 8px; font-size: 0.55rem; }
-}
-</style>
-</head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-
-<!-- Login Screen -->
-<div id="loginScreen" class="login-overlay">
-  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-    <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
-        <img src="icon-192.png" alt="Jobberman" class="w-10 h-10 object-contain" onerror="this.parentElement.innerHTML='<svg class=\'w-10 h-10 text-white\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\'/></svg>'">
-      </div>
-      <h1 class="text-2xl font-bold text-slate-800">HAPPY Program</h1>
-      <p class="text-slate-500 text-sm">Field Data Collection - Jobberman</p>
-    </div>
-    <form id="loginForm" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Collector Name</label>
-        <input type="text" id="collectorName" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Enter your name" required>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Collector ID</label>
-        <input type="text" id="collectorId" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., COL001" required>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-        <input type="password" id="password" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Enter password" required>
-      </div>
-      <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all">
-        Login
-      </button>
-    </form>
-    <div id="loginError" class="mt-4 text-red-600 text-sm text-center hidden"></div>
-    <div id="loginLoading" class="mt-4 flex items-center justify-center gap-2 hidden">
-      <div class="spinner"></div>
-      <span class="text-sm text-slate-600">Signing in...</span>
-    </div>
-  </div>
-</div>
-
-<!-- Online Status -->
-<div id="onlineStatus" class="online-status">
-  <span id="onlineStatusText">🟢 Online</span>
-</div>
-
-<!-- Main App (Hidden until login) -->
-<div id="mainApp" class="hidden">
-  <div class="container mx-auto px-3 py-4 max-w-7xl">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HAPPY Program - Jobberman DQA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Header -->
-    <header class="flex flex-wrap justify-between items-center mb-4 gap-3">
-      <div class="inline-flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center">
-          <img src="icon-192.png" alt="Jobberman" class="w-6 h-6 object-contain" onerror="this.parentElement.innerHTML='<svg class=\'w-6 h-6 text-white\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\'/></svg>'">
-        </div>
-        <div>
-          <h1 class="text-xl font-bold text-slate-800">HAPPY Program</h1>
-          <p class="text-xs text-slate-500">Collector: <span id="currentCollector" class="font-semibold text-indigo-600"></span></p>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <button onclick="logout()" class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-xs">
-          Logout
-        </button>
-      </div>
-    </header>
-
-    <!-- Stats Dashboard -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-3 text-white">
-        <p class="text-xs opacity-80">Onboarded</p>
-        <p class="text-2xl font-bold" id="onboardingCount">0</p>
-      </div>
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-3 text-white">
-        <p class="text-xs opacity-80">Trained</p>
-        <p class="text-2xl font-bold" id="capacityCount">0</p>
-      </div>
-      <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-3 text-white">
-        <p class="text-xs opacity-80">Placed</p>
-        <p class="text-2xl font-bold" id="placementCount">0</p>
-      </div>
-      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-3 text-white">
-        <p class="text-xs opacity-80">Total Records</p>
-        <p class="text-2xl font-bold" id="totalCount">0</p>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex flex-wrap gap-2 mb-4 justify-center">
-      <button onclick="switchTab('onboarding')" id="tab-onboarding" class="tab-active px-4 py-2 rounded-xl font-medium transition-all duration-200 shadow-lg text-sm">
-        Onboarding
-      </button>
-      <button onclick="switchTab('capacity')" id="tab-capacity" class="px-4 py-2 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 transition-all duration-200 shadow-lg text-sm">
-        Capacity Building
-      </button>
-      <button onclick="switchTab('placement')" id="tab-placement" class="px-4 py-2 rounded-xl font-medium bg-white text-slate-600 hover:bg-slate-100 transition-all duration-200 shadow-lg text-sm">
-        Placement
-      </button>
-    </div>
-
-    <!-- ONBOARDING FORM -->
-    <div id="form-onboarding" class="form-section rounded-2xl shadow-xl p-4 mb-4">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">Participant Onboarding</h2>
-      <form id="onboardingForm" class="space-y-3">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; }
+        .form-section { background: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 5px solid #1e40af; margin-bottom: 1.5rem; padding: 1.5rem; }
+        .label-text { display: block; font-size: 0.65rem; font-weight: 800; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .input-box { width: 100% !important; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.85rem; outline: none; transition: all 0.2s; }
+        .input-box:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
+        .required::after { content: " *"; color: #ef4444; }
+        .conditional-box { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #e2e8f0; }
+        .show { display: block !important; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        <!-- A, B, C, G -->
-        <div class="field-group border-l-4 border-l-blue-500">
-          <div class="field-group-title">Participant Identification</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">A</span> Participant ID</label><input type="text" id="onbParticipantId" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-100 text-xs" readonly></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">B</span> HAMIS ID</label><input type="text" id="onbHamisId" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">C</span> Onboarding Date</label><input type="date" id="onbDate" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">G</span> Implementing Partner</label><select id="onbPartner" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required onchange="generateOnbId()"><option value="">Select</option><option value="Jobberman">Jobberman</option><option value="Agrico">Agrico</option><option value="YouthEmpower">YouthEmpower</option><option value="SkillsGH">SkillsGH</option></select></div>
-          </div>
-        </div>
-
-        <!-- D, E, F -->
-        <div class="field-group border-l-4 border-l-indigo-500">
-          <div class="field-group-title">Sector Information</div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">D</span> Sector</label><select id="onbSector" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required onchange="populateOnbIndustries()"><option value="">Select</option><option value="Agriculture">Agriculture</option><option value="Non-Agriculture">Non-Agriculture</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">E</span> Industry</label><select id="onbIndustry" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required disabled onchange="populateOnbJobRoles()"><option value="">Select</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">F</span> Job Role</label><select id="onbJobRole" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required disabled><option value="">Select</option></select></div>
-          </div>
-        </div>
-
-        <!-- H, I, J, K -->
-        <div class="field-group border-l-4 border-l-purple-500">
-          <div class="field-group-title">Origin Location</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">H</span> Region</label><select id="onbRegion" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required onchange="populateOnbDistricts()"><option value="">Select</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">I</span> District</label><select id="onbDistrict" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required disabled><option value="">Select</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">J</span> Community</label><input type="text" id="onbCommunity" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">K</span> Location Status</label><select id="onbLocationStatus" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Urban">Urban</option><option value="Peri-Urban">Peri-Urban</option><option value="Rural">Rural</option></select></div>
-          </div>
-        </div>
-
-        <!-- P, Q, R, S, T, U, V, W -->
-        <div class="field-group border-l-4 border-l-pink-500">
-          <div class="field-group-title">Personal Information</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">P</span> PT-Support</label><select id="onbPTSupport" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Individual">Individual</option><option value="Casual Worker">Casual Worker</option><option value="Enterprises">Enterprises</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">Q</span> Surname</label><input type="text" id="onbSurname" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">R</span> First Name</label><input type="text" id="onbFirstName" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">S</span> Other Names</label><input type="text" id="onbOtherNames" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">T</span> Sex</label><select id="onbSex" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">U</span> DOB</label><input type="date" id="onbDob" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required onchange="calcOnbAge()"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">V</span> Age (Auto)</label><div id="onbAgeDisplay" class="w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg text-white font-bold text-center text-xs">--</div><input type="hidden" id="onbAge"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">W</span> PT-Age</label><select id="onbPTAge" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Auto</option><option value="Youth">Youth (15-35)</option><option value="Non-Youth">Non-Youth</option></select></div>
-          </div>
-        </div>
-
-        <!-- X, Y, Z, AA, AB -->
-        <div class="field-group border-l-4 border-l-teal-500">
-          <div class="field-group-title">Contact & ID</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">X</span> Telephone</label><input type="tel" id="onbTelephone" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" placeholder="0244111111" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">Y</span> Guarantor</label><input type="text" id="onbGuarantor" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">Z</span> ID Type</label><select id="onbIdType" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="Ghana Card">Ghana Card</option><option value="Voter's ID">Voter's ID</option><option value="Passport">Passport</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AA</span> Ghana Card</label><input type="text" id="onbGhanaCard" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AB</span> Voter's ID</label><input type="text" id="onbVotersId" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-          </div>
-        </div>
-
-        <!-- AC, AD, AE, AF -->
-        <div class="field-group border-l-4 border-l-amber-500">
-          <div class="field-group-title">Refugee & Disability</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AC</span> Refugee</label><select id="onbRefugee" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" onchange="toggleOnbRefugee()"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-            <div id="onbRefugeeNatField" class="hidden"><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AD</span> Nationality</label><input type="text" id="onbRefugeeNat" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AE</span> Disability</label><select id="onbDisability" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" onchange="toggleOnbDisability()"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-            <div id="onbDisabilitySpecField" class="hidden"><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AF</span> Specify</label><select id="onbDisabilitySpec" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="Hearing">Hearing</option><option value="Visual">Visual</option><option value="Mobility">Mobility</option><option value="Other">Other</option></select></div>
-          </div>
-        </div>
-
-        <!-- AG, AH, AI, AJ, AK -->
-        <div class="field-group border-l-4 border-l-indigo-500">
-          <div class="field-group-title">Education & Employment</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">AG</span> Education</label><select id="onbEducation" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="None">None</option><option value="Primary">Primary</option><option value="JHS">JHS</option><option value="SHS">SHS</option><option value="Vocational">Vocational</option><option value="College">College</option><option value="University">University</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="col-badge">AH</span> Employment Status</label><select id="onbEmploymentStatus" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Employed">Employed</option><option value="Unemployed">Unemployed</option><option value="Casual Worker">Casual Worker</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AI</span> Occupation</label><input type="text" id="onbOccupation" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AJ</span> Monthly Income</label><select id="onbIncome" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="None">None</option><option value="1-200">1-200 GHS</option><option value="201-500">201-500 GHS</option><option value="501-1000">501-1000 GHS</option><option value="1001+">1001+ GHS</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="col-badge">AK</span> Income Freq</label><select id="onbIncomeFreq" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="Daily">Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div>
-          </div>
-        </div>
-
-        <div class="flex gap-3 pt-2">
-          <button type="button" onclick="submitOnboarding()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg text-sm flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Save Participant
-          </button>
-          <button type="button" onclick="resetOnboarding()" class="px-4 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold text-sm">Reset</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- CAPACITY BUILDING FORM -->
-    <div id="form-capacity" class="form-section rounded-2xl shadow-xl p-4 mb-4 hidden">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">Capacity Building Training Record</h2>
-      <form id="capacityForm" class="space-y-3">
+        .sheet-container { overflow: auto; background: white; border: 1px solid #cbd5e1; height: 70vh; }
+        .sheet-table { border-collapse: collapse; width: 100%; font-size: 0.75rem; }
+        .sheet-table th { background: #1e40af; color: white; padding: 8px; position: sticky; top: 0; z-index: 10; border: 1px solid #1e3a8a; }
+        .sheet-table td { padding: 6px; border: 1px solid #e2e8f0; white-space: nowrap; }
         
-        <!-- Participant Selection -->
-        <div class="field-group border-l-4 border-l-purple-500">
-          <div class="field-group-title">📋 Select Participant</div>
-          <div class="mb-3">
-            <label class="block text-xs font-medium text-slate-700 mb-1 required">Participant ID</label>
-            <select id="capParticipantId" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" required onchange="loadCapData()">
-              <option value="">Select from onboarded participants</option>
-            </select>
-          </div>
-        </div>
+        .auto-field { background-color: #f1f5f9; font-weight: 600; color: #1e40af; }
+    </style>
+</head>
+<body class="pb-20">
 
-        <!-- Training Details -->
-        <div class="field-group border-l-4 border-l-indigo-500">
-          <div class="field-group-title">✏️ Training Details</div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="capacity-badge">C</span> Start Date</label><input type="date" id="capStartDate" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="capacity-badge">D</span> End Date</label><input type="date" id="capEndDate" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="capacity-badge">E</span> Training Location</label><input type="text" id="capLocation" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="capacity-badge">Mode</span> Training Mode</label><select id="capTrainingMode" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required onchange="toggleVirtualTraining()"><option value="">Select</option><option value="In-person">In-person</option><option value="Virtual">Virtual</option><option value="Hybrid">Hybrid</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="capacity-badge">AA</span> Trainer Type</label><select id="capTrainerType" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Internal">Internal</option><option value="External">External</option></select></div>
-          </div>
-
-          <!-- Virtual Training Follow-up (ONLY shows when Virtual mode selected) -->
-          <div id="virtualTrainingSection" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-300">
-            <h3 class="text-sm font-bold text-blue-800 mb-3">🖥️ Virtual Training Details</h3>
-            <div class="mb-3">
-              <label class="block text-xs font-medium text-slate-700 mb-2">Virtual Platform Used</label>
-              <select id="capVirtualPlatform" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
-                <option value="">Select</option>
-                <option value="Zoom">Zoom</option>
-                <option value="Google Meet">Google Meet</option>
-                <option value="Microsoft Teams">Microsoft Teams</option>
-                <option value="WhatsApp">WhatsApp</option>
-                <option value="Other">Other</option>
-              </select>
+    <nav class="bg-[#1e40af] text-white p-4 sticky top-0 z-50 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-700 mb-2">Digital Training Modules (Select all that apply)</label>
-              <div class="grid grid-cols-2 gap-2">
-                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capDigitalModules" value="Digital Literacy" class="rounded"> Digital Literacy</label>
-                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capDigitalModules" value="ICT Skills" class="rounded"> ICT Skills</label>
-                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capDigitalModules" value="E-Learning" class="rounded"> E-Learning</label>
-                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capDigitalModules" value="Online Collaboration" class="rounded"> Online Collaboration</label>
-              </div>
+                <h1 class="text-sm font-bold tracking-tight">HAPPY Program - Jobberman</h1>
+                <p class="text-[10px] opacity-80">Field Data Collection System</p>
             </div>
-          </div>
+        </div>
+        <div class="flex bg-blue-900/40 p-1 rounded-lg">
+            <button onclick="setView('form')" id="btn-form" class="bg-blue-600 px-4 py-1.5 rounded text-xs font-bold transition">Entry Form</button>
+            <button onclick="setView('sheet')" id="btn-sheet" class="px-4 py-1.5 rounded text-xs font-bold transition">Master Sheet</button>
+        </div>
+    </nav>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="capacity-badge">X</span> Completion Status</label><select id="capCompletion" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="capacity-badge">Y</span> Certificate</label><select id="capCertificate" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1"><span class="capacity-badge">Z</span> Training Partner</label><select id="capPartner" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"><option value="">Select</option><option value="Jobberman">Jobberman</option><option value="Agrico">Agrico</option><option value="TVET">TVET</option><option value="Other">Other</option></select></div>
-          </div>
-
-          <!-- Training Modules (General - shown always) -->
-          <div class="mt-4">
-            <label class="block text-xs font-medium text-slate-700 mb-2">Training Modules Completed (Select all that apply)</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Digital Literacy" class="rounded"> Digital Literacy</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Entrepreneurship" class="rounded"> Entrepreneurship</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Financial Management" class="rounded"> Financial Management</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Agri-Business" class="rounded"> Agri-Business</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="ICT Skills" class="rounded"> ICT Skills</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Soft Skills" class="rounded"> Soft Skills</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Vocational Training" class="rounded"> Vocational Training</label>
-              <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="capModules" value="Other" class="rounded"> Other</label>
+    <div id="view-form" class="max-w-6xl mx-auto px-4 mt-6">
+        <form id="masterForm" onsubmit="handleFormSubmit(event)">
+            
+            <!-- SECTION A: SYSTEM IDS -->
+            <div class="form-section">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-blue-700 font-black text-sm">SECTION A: SYSTEM METRICS</h2>
+                    <span id="subIdText" class="text-[10px] font-mono text-slate-400 bg-slate-50 px-2 rounded">SUB-AUTO-PENDING</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div><label class="label-text">Collector</label><input type="text" id="collector" class="input-box" placeholder="Your Name"></div>
+                    <div><label class="label-text">Participant ID</label><input type="text" id="participantId" class="input-box auto-field" readonly></div>
+                    <div><label class="label-text">HAMIS Registry ID</label><input type="text" id="hamisId" class="input-box" placeholder="E.g. REG-102"></div>
+                    <div><label class="label-text">Onboarding Date</label><input type="date" id="onbDate" class="input-box"></div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div class="flex gap-3 pt-2">
-          <button type="button" onclick="submitCapacity()" class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg text-sm flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Save Training
-          </button>
-          <button type="button" onclick="resetCapacity()" class="px-4 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold text-sm">Reset</button>
-        </div>
-      </form>
+            <!-- SECTION B: DEMOGRAPHICS -->
+            <div class="form-section" style="border-top-color: #3b82f6;">
+                <h2 class="text-blue-700 font-black text-sm mb-4">SECTION B: PARTICIPANT ONBOARDING</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="label-text required">Implementing Partner</label>
+                        <select id="partner" class="input-box" required onchange="updateIds()"></select>
+                    </div>
+                    <div>
+                        <label class="label-text required">Participant Type - Support</label>
+                        <select id="ptSupport" class="input-box" required></select>
+                    </div>
+                    <div>
+                        <label class="label-text">Participant Type - Age</label>
+                        <input type="text" id="ptAge" class="input-box auto-field" readonly placeholder="Auto from DOB">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div><label class="label-text required">Surname</label><input type="text" id="surname" class="input-box" required></div>
+                    <div><label class="label-text required">First Name</label><input type="text" id="firstName" class="input-box" required></div>
+                    <div><label class="label-text">Other Names</label><input type="text" id="otherNames" class="input-box"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div><label class="label-text required">Sex</label><select id="sex" class="input-box" required></select></div>
+                    <div><label class="label-text required">DOB</label><input type="date" id="dob" class="input-box" required onchange="handleDOBChange()"></div>
+                    <div><label class="label-text">Age</label><input type="text" id="age" class="input-box auto-field" readonly></div>
+                    <div><label class="label-text">Youth Type</label><input type="text" id="youthType" class="input-box auto-field" readonly placeholder="Auto from DOB"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div><label class="label-text required">Telephone</label><input type="tel" id="tel" class="input-box" required placeholder="024XXXXXXX"></div>
+                    <div>
+                        <label class="label-text required">ID Type</label>
+                        <select id="idType" class="input-box" required onchange="handleIdTypeChange()"></select>
+                        <input type="text" id="idTypeOther" class="input-box mt-2 hidden" placeholder="Specify ID Type">
+                    </div>
+                    <div>
+                        <label class="label-text required">ID Number</label>
+                        <input type="text" id="idNum" class="input-box" required placeholder="Select ID Type first" oninput="formatIdNumber(this)">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="label-text required">Education Level</label>
+                        <select id="education" class="input-box" required onchange="handleOtherToggle('education', 'eduOther')"></select>
+                        <input type="text" id="eduOther" class="input-box mt-2 hidden" placeholder="Specify Education">
+                    </div>
+                    <div><label class="label-text required">Region (Origin)</label><select id="region" class="input-box" required onchange="updateDistricts('region','district'); updateIds();"></select></div>
+                    <div><label class="label-text required">District (Origin)</label><select id="district" class="input-box" required disabled></select></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div><label class="label-text required">Community (Origin)</label><input type="text" id="community" class="input-box" required></div>
+                    <div class="md:col-span-1">
+                        <label class="label-text required">Refugee Status</label>
+                        <select id="refugee" class="input-box" required onchange="toggleRefugee()">
+                            <option value="No">No (Ghanaian)</option><option value="Yes">Yes (Refugee)</option>
+                        </select>
+                        <input type="text" id="nationality" class="input-box mt-2 hidden" placeholder="Enter Nationality">
+                    </div>
+                    <div class="md:col-span-1">
+                        <label class="label-text required">Disability Status</label>
+                        <select id="disability" class="input-box" required onchange="toggleDisability()">
+                            <option value="No">No</option><option value="Yes">Yes</option>
+                        </select>
+                        <input type="text" id="disDetail" class="input-box mt-2 hidden" placeholder="Specify Disability">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION C: BASELINE WORK -->
+            <div class="form-section" style="border-top-color: #64748b;">
+                <h2 class="text-slate-700 font-black text-sm mb-4">SECTION C: BASELINE EMPLOYMENT (CURRENT)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div><label class="label-text required">Employment Status</label><select id="baseEmpStatus" class="input-box" required onchange="toggleBlock('base_logic', this.value === 'Yes')"></select></div>
+                </div>
+
+                <div id="base_logic" class="conditional-box">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div><label class="label-text required">Sector</label><select id="baseSector" class="input-box" onchange="updateSubs('baseSector','baseSub')"></select></div>
+                        <div><label class="label-text required">Industry/Sub</label><select id="baseSub" class="input-box" disabled></select></div>
+                        <div><label class="label-text required">Job Level</label><select id="baseLevel" class="input-box"></select></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div><label class="label-text required">Type</label><select id="baseType" class="input-box"></select></div>
+                        <div><label class="label-text required">Category</label><select id="baseCat" class="input-box"></select></div>
+                        <div><label class="label-text">Wage Frequency</label><select id="baseFreq" class="input-box"></select></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div><label class="label-text">Wage (GHS)</label><input type="number" id="baseWage" class="input-box"></div>
+                        <div><label class="label-text">Employer</label><input type="text" id="baseEmployer" class="input-box"></div>
+                        <div><label class="label-text">Current Occupation</label><input type="text" id="baseOcc" class="input-box"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label class="label-text">Region of Work</label><select id="baseReg" class="input-box" onchange="updateDistricts('baseReg','baseDist')"></select></div>
+                        <div><label class="label-text">District of Work</label><select id="baseDist" class="input-box" disabled></select></div>
+                        <div><label class="label-text">Town/Community</label><input type="text" id="baseComm" class="input-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION D: CAPACITY BUILDING -->
+            <div class="form-section" style="border-top-color: #8b5cf6;">
+                <h2 class="text-purple-700 font-black text-sm mb-4">SECTION D: CAPACITY BUILDING</h2>
+                <div class="bg-purple-50 p-3 rounded mb-4">
+                    <label class="label-text">Has participant been trained by partner?</label>
+                    <div class="flex gap-4 mt-1">
+                        <label class="text-xs font-bold"><input type="radio" name="tr_check" value="Yes" onclick="toggleBlock('tr_logic', true)"> YES</label>
+                        <label class="text-xs font-bold"><input type="radio" name="tr_check" value="No" onclick="toggleBlock('tr_logic', false)" checked> NO</label>
+                    </div>
+                </div>
+                
+                <div id="tr_logic" class="conditional-box">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div><label class="label-text">Start Date</label><input type="date" id="trStart" class="input-box"></div>
+                        <div><label class="label-text">End Date</label><input type="date" id="trEnd" class="input-box"></div>
+                        <div><label class="label-text">Trainer Type</label><select id="trType" class="input-box"></select></div>
+                        <div><label class="label-text">Status</label><select id="trStatus" class="input-box"></select></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="label-text">Sector of Training</label><select id="trSector" class="input-box" onchange="updateSubs('trSector', 'trSub')"></select></div>
+                        <div><label class="label-text">Module/Sub-Sector</label><select id="trSub" class="input-box" disabled></select></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION E: PLACEMENT -->
+            <div class="form-section" style="border-top-color: #10b981;">
+                <h2 class="text-emerald-700 font-black text-sm mb-4">SECTION E: PARTNER PLACEMENT</h2>
+                <div class="bg-emerald-50 p-3 rounded mb-4">
+                    <label class="label-text">Was participant placed in a job?</label>
+                    <div class="flex gap-4 mt-1">
+                        <label class="text-xs font-bold"><input type="radio" name="pl_check" value="Yes" onclick="toggleBlock('pl_logic', true)"> YES</label>
+                        <label class="text-xs font-bold"><input type="radio" name="pl_check" value="No" onclick="toggleBlock('pl_logic', false)" checked> NO</label>
+                    </div>
+                </div>
+
+                <div id="pl_logic" class="conditional-box">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div><label class="label-text required">Sector</label><select id="plSector" class="input-box" onchange="updateSubs('plSector','plSub')"></select></div>
+                        <div><label class="label-text required">Industry/Sub</label><select id="plSub" class="input-box" disabled></select></div>
+                        <div><label class="label-text required">Job Level</label><select id="plLevel" class="input-box"></select></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div><label class="label-text required">Type</label><select id="plType" class="input-box"></select></div>
+                        <div><label class="label-text required">Category</label><select id="plCat" class="input-box"></select></div>
+                        <div><label class="label-text">Wage Frequency</label><select id="plFreq" class="input-box"></select></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div><label class="label-text">Wage (GHS)</label><input type="number" id="plWage" class="input-box"></div>
+                        <div><label class="label-text">Employer</label><input type="text" id="plEmployer" class="input-box"></div>
+                        <div><label class="label-text">Region of Work</label><select id="plReg" class="input-box" onchange="updateDistricts('plReg','plDist')"></select></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="label-text">District of Work</label><select id="plDist" class="input-box" disabled></select></div>
+                        <div><label class="label-text">Town/Community</label><input type="text" id="plComm" class="input-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-800 transition transform active:scale-95 mb-10 uppercase tracking-widest">Submit Records to Registry</button>
+        </form>
     </div>
 
-    <!-- PLACEMENT FORM -->
-    <div id="form-placement" class="form-section rounded-2xl shadow-xl p-4 mb-4 hidden">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">Job Placement Record</h2>
-      <form id="placementForm" class="space-y-3">
-        
-        <!-- Participant Selection -->
-        <div class="field-group border-l-4 border-l-indigo-500">
-          <div class="field-group-title">📋 Select Participant</div>
-          <div class="mb-3">
-            <label class="block text-xs font-medium text-slate-700 mb-1 required">Participant ID</label>
-            <select id="placeParticipantId" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" required onchange="loadPlacementData()">
-              <option value="">Select from onboarded participants</option>
-            </select>
-          </div>
+    <div id="view-sheet" class="hidden max-w-full px-2 mt-6">
+        <div class="bg-white p-4 rounded-lg shadow border flex justify-between items-center mb-4">
+            <h2 class="font-black text-blue-800 uppercase text-xs tracking-widest">Master Data Repository</h2>
+            <div class="flex gap-2">
+                <button onclick="exportData()" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded font-bold">EXPORT CSV</button>
+                <button onclick="clearData()" class="bg-red-50 text-red-600 text-[10px] px-3 py-1 rounded font-bold">CLEAR ALL</button>
+            </div>
         </div>
-
-        <!-- Placement Details -->
-        <div class="field-group border-l-4 border-l-blue-500">
-          <div class="field-group-title">✏️ Placement Details</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="placement-badge">C</span> Start Date</label><input type="date" id="placeStartDate" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="placement-badge">D</span> IP Partner</label><select id="placeIPManual" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Jobberman">Jobberman</option><option value="Agrico">Agrico</option><option value="Other">Other</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="placement-badge">Z</span> Income</label><select id="placeIncome" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="None">None</option><option value="1-200">1-200 GHS</option><option value="201-500">201-500 GHS</option><option value="501-1000">501-1000 GHS</option><option value="1001+">1001+ GHS</option></select></div>
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="placement-badge">AA</span> Employment Type</label><select id="placeEmpType" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="Wage">Wage</option><option value="Self-Employment">Self-Employment</option></select></div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-            <div><label class="block text-xs font-medium text-slate-700 mb-1 required"><span class="placement-badge">AB</span> Employment Category</label><select id="placeEmpCategory" class="input-field w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required><option value="">Select</option><option value="New">New</option><option value="Improved">Improved</option><option value="Additional">Additional</option></select></div>
-          </div>
+        <div class="sheet-container shadow-inner">
+            <table class="sheet-table" id="mainSheet">
+                <thead id="sheetHead"></thead>
+                <tbody id="sheetBody"></tbody>
+            </table>
         </div>
-
-        <div class="flex gap-3 pt-2">
-          <button type="button" onclick="submitPlacement()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-3 rounded-xl font-semibold shadow-lg text-sm flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Save Placement
-          </button>
-          <button type="button" onclick="resetPlacement()" class="px-4 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold text-sm">Reset</button>
-        </div>
-      </form>
     </div>
 
-  </div>
-</div>
+    <script>
+        const config = {
+            partners: ["Jobberman", "Agrico", "YouthEmpower", "SkillsGH", "Other"],
+            regions: {
+                "Greater Accra": ["Ablekuma Central", "Ablekuma North", "Ablekuma West", "Accra Metropolitan", "Ada East", "Ada West", "Adenta", "Ashaiman", "Ayawaso East", "Ayawaso North", "Ayawaso West", "Ga Central", "Ga East", "Ga North", "Ga South", "Ga West", "Korle Klottey", "Kpone Katamanso", "Krowor", "La Dade Kotopon", "La Nkwantanang Madina", "Ledzokuku", "Ningo Prampram", "Okaikwei North", "Shai Osudoku", "Tema Metropolitan", "Tema West", "Weija Gbawe"],
+                "Ashanti": ["Adansi Asokwa", "Adansi North", "Adansi South", "Afigya Kwabre North", "Afigya Kwabre South", "Ahafo Ano North", "Ahafo Ano South East", "Ahafo Ano South West", "Amansie Central", "Amansie South", "Amansie West", "Asante Akim Central", "Asante Akim North", "Asante Akim South", "Asokore Mampong", "Atwima Kwanwoma", "Atwima Mponua", "Atwima Nwabiagya North", "Atwima Nwabiagya South", "Bekwai", "Bosome Freho", "Bosomtwe", "Ejisu", "Ejura Sekyedumase", "Juaben", "Kumasi Metropolitan", "Kwabre East", "Kwadaso", "Mampong", "Obuasi East", "Obuasi Municipal", "Offinso Municipal", "Offinso North", "Oforikrom", "Old Tafo", "Sekyere Afram Plains", "Sekyere Central", "Sekyere East", "Sekyere Kumawu", "Sekyere South", "Suame", "Asokwa", "Bantama"],
+                "Eastern": ["Abuakwa North", "Abuakwa South", "Achiase", "Akwapim North", "Akwapim South", "Akyemansa", "Asene Manso Akroso", "Asuogyaman", "Atiwa East", "Atiwa West", "Ayensuano", "Birim North", "Birim South", "Birem Central", "Denkyembour", "Fanteakwa North", "Fanteakwa South", "Kwaebibirem", "Kwahu Afram Plains North", "Kwahu Afram Plains South", "Kwahu East", "Kwahu South", "Kwahu West", "Lower Manya Krobo", "New Juaben North", "New Juaben South", "Nsawam Adoagyiri", "Okere", "Suhum", "Upper Manya Krobo", "Upper West Akim", "Yilo Krobo"],
+                "Volta": ["Adaklu", "Afadzato South", "Agotime-Ziope", "Akatsi North", "Akatsi South", "Anloga", "Central Tongu", "Ho Municipal", "Ho West", "Hohoe Municipal", "Keta Municipal", "Ketu North", "Ketu South", "Kpando Municipal", "North Dayi", "North Tongu", "South Dayi", "South Tongu"],
+                "Northern": ["Gushegu", "Karaga", "Kpandai", "Kumbungu", "Mion", "Nanumba North", "Nanumba South", "Nanton", "Saboba", "Sagnarigu", "Savelugu", "Tamale Metropolitan", "Tatale Sanguli", "Tolon", "Yendi Municipal", "Zabzugu", "North Gonja", "Central Gonja"],
+                "North East": ["Bunkpurugu-Nyankpanduri", "Chereponi", "East Mamprusi", "Mamprugu Moagduri", "West Mamprusi", "Yunyoo-Nasuan"],
+                "Upper West": ["Daffiama-Bussie-Issa", "Jirapa", "Lambussie", "Lawra", "Nadowli-Kaleo", "Nandom", "Sissala East", "Sissala West", "Wa East", "Wa Municipal", "Wa West"],
+                "Upper East": ["Bawku Municipal", "Bawku West", "Binduri", "Bolgatanga East", "Bolgatanga Municipal", "Bongo", "Builsa North", "Builsa South", "Garu", "Kassena-Nankana East", "Kassena-Nankana West", "Nabdam", "Pusiga", "Talensi", "Tempane"],
+                "Oti": ["Biakoye", "Guan", "Jasikan", "Kadjebi", "Krachi East", "Krachi Nchumuru", "Krachi West", "Nkwanta North", "Nkwanta South"],
+                "Bono": ["Banda", "Berekum East", "Berekum West", "Dormaa Central", "Dormaa East", "Dormaa West", "Jaman North", "Jaman South", "Sunyani", "Sunyani West", "Tain", "Wenchi"],
+                "Bono East": ["Atebubu-Amantin", "Kintampo North", "Kintampo South", "Nkoranza North", "Nkoranza South", "Pru East", "Pru West", "Sene East", "Sene West", "Techiman Municipal", "Techiman North"],
+                "Ahafo": ["Asunafo North", "Asunafo South", "Asutifi North", "Asutifi South", "Tano North", "Tano South"],
+                "Savannah": ["Bole", "Central Gonja", "East Gonja", "North East Gonja", "North Gonja", "Sawla-Tuna-Kalba", "West Gonja"],
+                "Western": ["Ahanta West", "Effia-Kwesimintsim", "Ellembelle", "Jomoro", "Mpohor", "Nzema East", "Prestea-Huni Valley", "Sekondi-Takoradi Metropolitan", "Shama", "Tarkwa-Nsuaem", "Wassa Amenfi Central", "Wassa Amenfi East", "Wassa Amenfi West", "Wassa East"],
+                "Western North": ["Aowin", "Bia East", "Bia West", "Bibiani-Anhwiaso-Bekwai", "Bodi", "Juaboso", "Sefwi Akontombra", "Sefwi Wiawso Municipal", "Suaman"],
+                "Central": ["Abura-Asebu-Kwamankese", "Agona East", "Agona West", "Ajumako-Enyan-Essiam", "Asikuma-Odoben-Brakwa", "Assin Central", "Assin North", "Assin South", "Awutu Senya", "Awutu Senya East", "Cape Coast Metropolitan", "Effutu", "Ekumfi", "Gomoa Central", "Gomoa East", "Gomoa West", "Komenda-Edina-Eguafo-Abrem", "Mfantsiman", "Twifo-Atti Morkwa", "Twifo Hemang Lower Denkyira", "Upper Denkyira East", "Upper Denkyira West"]
+            },
+            ptSupport: ["Individual", "Casual Worker", "Enterprises"],
+            education: ["None", "Primary", "JHS", "SHS", "Vocational", "Technical", "University", "College", "Other"],
+            idTypes: ["Ghana Card", "Voter's ID", "Passport", "Other"],
+            empStatus: ["Yes", "No"],
+            jobLevels: ["Management", "Technical", "Administrative", "Support"],
+            trTypes: ["Internal", "External", "Both"],
+            trStatus: ["Complete", "Incomplete"],
+            empType: ["Wage", "Self"],
+            empCat: ["New", "Improved", "Additional"],
+            freq: ["Daily", "Weekly", "Bi-weekly", "Monthly"],
+            sectors: {
+                "Agriculture": ["Rice", "Poultry", "Tomato", "Soybean", "Maize", "Cassava"],
+                "Non-Agriculture": ["Tourism", "ICT", "Construction", "Retail", "Manufacturing", "Health", "Education"]
+            }
+        };
 
-<!-- Toast Notification -->
-<div id="toast" class="fixed bottom-4 right-4 hidden toast">
-  <div class="bg-slate-800 text-white px-4 py-2 rounded-xl shadow-lg text-xs">
-    <span id="toastMessage">Success!</span>
-  </div>
-</div>
+        const headers = [
+            "Participant ID", "Implementing Partner", "PT-Support", "PT-Age", "Youth-Type", "Surname", "First Name", "Sex", "Age", "Telephone",
+            "ID Type", "ID Number", "Education", "Region", "District", "Refugee", "Disability", 
+            "Baseline-Status", "Baseline-Sector", "Baseline-Sub", "Baseline-Level", "Baseline-Wage",
+            "Trained?", "Tr-Sector", "Tr-Status", "Placed?", "Pl-Sector", "Pl-Sub", "Pl-Level", "Pl-Wage", "Timestamp"
+        ];
 
-<!-- Developer Signature -->
-<div class="developer-signature">
-  Powered by: Murphy Richards - MERL Manager
-</div>
+        let db = JSON.parse(localStorage.getItem('hamis_master_v4')) || [];
 
-<script src="script.js"></script>
+        window.onload = () => {
+            initDropdowns();
+            renderSheet();
+            updateIds();
+        };
+
+        function initDropdowns() {
+            populate('partner', config.partners);
+            populate('ptSupport', config.ptSupport);
+            populate('sex', ["Male", "Female"]);
+            populate('education', config.education);
+            populate('idType', config.idTypes);
+            populate('region', Object.keys(config.regions));
+            populate('baseReg', Object.keys(config.regions));
+            populate('plReg', Object.keys(config.regions));
+            populate('baseEmpStatus', config.empStatus);
+            populate('baseLevel', config.jobLevels);
+            populate('plLevel', config.jobLevels);
+            populate('baseType', config.empType);
+            populate('plType', config.empType);
+            populate('baseCat', config.empCat);
+            populate('plCat', config.empCat);
+            populate('baseFreq', config.freq);
+            populate('plFreq', config.freq);
+            populate('trType', config.trTypes);
+            populate('trStatus', config.trStatus);
+            populate('trSector', Object.keys(config.sectors));
+            populate('plSector', Object.keys(config.sectors));
+            populate('baseSector', Object.keys(config.sectors));
+
+            const head = document.getElementById('sheetHead');
+            const tr = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.innerText = h;
+                tr.appendChild(th);
+            });
+            head.appendChild(tr);
+        }
+
+        function populate(id, list) {
+            const el = document.getElementById(id);
+            el.innerHTML = '<option value="">Select</option>';
+            list.forEach(i => el.add(new Option(i, i)));
+        }
+
+        function handleDOBChange() {
+            const dobVal = document.getElementById('dob').value;
+            if (!dobVal) return;
+            
+            const dob = new Date(dobVal);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            document.getElementById('age').value = age;
+
+            const ptAge = document.getElementById('ptAge');
+            const youthType = document.getElementById('youthType');
+
+            if (age >= 15 && age <= 35) {
+                ptAge.value = "Youth";
+                if (age <= 17) youthType.value = "15-17";
+                else if (age <= 24) youthType.value = "18-24";
+                else if (age <= 29) youthType.value = "25-29";
+                else youthType.value = "30-35";
+            } else {
+                ptAge.value = age > 35 ? "Non-Youth" : "Underage";
+                youthType.value = "N/A";
+            }
+        }
+
+        function handleIdTypeChange() {
+            const idType = document.getElementById('idType').value;
+            const idNum = document.getElementById('idNum');
+            
+            handleOtherToggle('idType', 'idTypeOther');
+            
+            if (idType === "Ghana Card") {
+                idNum.placeholder = "GHA-XXXXXXXXX-X";
+                if (!idNum.value.startsWith('GHA-')) {
+                    idNum.value = "GHA-";
+                }
+            } else {
+                idNum.placeholder = "Enter ID Number";
+                if (idNum.value.startsWith('GHA-')) {
+                    idNum.value = "";
+                }
+            }
+        }
+
+        function formatIdNumber(input) {
+            const idType = document.getElementById('idType').value;
+            if (idType === "Ghana Card") {
+                let val = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+                
+                if (!val.startsWith('GHA-')) val = "GHA-" + val.replace('GHA', '');
+                
+                if (val.length > 13 && val[13] !== '-') {
+                    val = val.slice(0, 13) + '-' + val.slice(13);
+                }
+                
+                input.value = val.slice(0, 15);
+            }
+        }
+
+        function handleOtherToggle(selectId, otherId) {
+            const val = document.getElementById(selectId).value;
+            document.getElementById(otherId).classList.toggle('hidden', val !== 'Other');
+        }
+
+        function updateDistricts(regId, distId) {
+            const reg = document.getElementById(regId).value;
+            const dist = document.getElementById(distId);
+            dist.innerHTML = '';
+            if(reg && config.regions[reg]) {
+                config.regions[reg].forEach(d => dist.add(new Option(d, d)));
+                dist.disabled = false;
+            } else { dist.disabled = true; }
+        }
+
+        function updateSubs(secId, subId) {
+            const sec = document.getElementById(secId).value;
+            const sub = document.getElementById(subId);
+            sub.innerHTML = '';
+            if(sec && config.sectors[sec]) {
+                config.sectors[sec].forEach(s => sub.add(new Option(s, s)));
+                sub.disabled = false;
+            } else { sub.disabled = true; }
+        }
+
+        function updateIds() {
+            const partner = document.getElementById('partner').value || "IP";
+            const reg = document.getElementById('region').value || "XXX";
+            const pPrefix = partner.substring(0,3).toUpperCase();
+            const pSeq = String(db.length + 1).padStart(7, '0');
+            document.getElementById('participantId').value = `${pPrefix}--${pSeq}`;
+
+            const regPrefix = reg.substring(0,3).toUpperCase();
+            const sSeq = String(db.length + 1).padStart(6, '0');
+            const ts = new Date().toISOString().replace(/[-:T.]/g, '').substring(0, 14);
+            document.getElementById('subIdText').innerText = `${regPrefix}-${sSeq}-${ts}`;
+        }
+
+        function toggleRefugee() { document.getElementById('nationality').classList.toggle('hidden', document.getElementById('refugee').value === 'No'); }
+        function toggleDisability() { document.getElementById('disDetail').classList.toggle('hidden', document.getElementById('disability').value === 'No'); }
+        function toggleBlock(id, show) { 
+            const el = document.getElementById(id);
+            el.classList.toggle('show', show);
+            const inputs = el.querySelectorAll('select, input');
+            inputs.forEach(i => {
+                if(show) i.setAttribute('required', '');
+                else i.removeAttribute('required');
+            });
+        }
+
+        function setView(v) {
+            document.getElementById('view-form').classList.toggle('hidden', v !== 'form');
+            document.getElementById('view-sheet').classList.toggle('hidden', v !== 'sheet');
+            document.getElementById('btn-form').classList.toggle('bg-blue-600', v === 'form');
+            document.getElementById('btn-sheet').classList.toggle('bg-blue-600', v === 'sheet');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const idType = document.getElementById('idType').value;
+            const idNum = document.getElementById('idNum').value;
+            if(idType === "Ghana Card" && idNum.length !== 15) {
+                alert("Ghana Card ID must be exactly 15 characters (GHA-XXXXXXXXX-X)");
+                return;
+            }
+
+            const record = {
+                "Participant ID": document.getElementById('participantId').value,
+                "Implementing Partner": document.getElementById('partner').value,
+                "PT-Support": document.getElementById('ptSupport').value,
+                "PT-Age": document.getElementById('ptAge').value,
+                "Youth-Type": document.getElementById('youthType').value,
+                "Surname": document.getElementById('surname').value,
+                "First Name": document.getElementById('firstName').value,
+                "Sex": document.getElementById('sex').value,
+                "Age": document.getElementById('age').value,
+                "Telephone": document.getElementById('tel').value,
+                "ID Type": idType === 'Other' ? document.getElementById('idTypeOther').value : idType,
+                "ID Number": idNum,
+                "Education": document.getElementById('education').value === 'Other' ? document.getElementById('eduOther').value : document.getElementById('education').value,
+                "Region": document.getElementById('region').value,
+                "District": document.getElementById('district').value,
+                "Refugee": document.getElementById('refugee').value,
+                "Disability": document.getElementById('disability').value,
+                "Baseline-Status": document.getElementById('baseEmpStatus').value,
+                "Baseline-Sector": document.getElementById('baseSector').value,
+                "Baseline-Sub": document.getElementById('baseSub').value,
+                "Baseline-Level": document.getElementById('baseLevel').value,
+                "Baseline-Wage": document.getElementById('baseWage').value,
+                "Trained?": document.querySelector('input[name="tr_check"]:checked').value,
+                "Tr-Sector": document.getElementById('trSector').value,
+                "Tr-Status": document.getElementById('trStatus').value,
+                "Placed?": document.querySelector('input[name="pl_check"]:checked').value,
+                "Pl-Sector": document.getElementById('plSector').value,
+                "Pl-Sub": document.getElementById('plSub').value,
+                "Pl-Level": document.getElementById('plLevel').value,
+                "Pl-Wage": document.getElementById('plWage').value,
+                "Timestamp": new Date().toLocaleString()
+            };
+
+            db.push(record);
+            localStorage.setItem('hamis_master_v4', JSON.stringify(db));
+            alert("Record A-AK synchronized with local database.");
+            renderSheet();
+            setView('sheet');
+            document.getElementById('masterForm').reset();
+            updateIds();
+        }
+
+        function renderSheet() {
+            const body = document.getElementById('sheetBody');
+            body.innerHTML = '';
+            db.forEach(r => {
+                const tr = document.createElement('tr');
+                headers.forEach(h => {
+                    const td = document.createElement('td');
+                    td.innerText = r[h] || "-";
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+        }
+
+        function exportData() {
+            let csv = headers.join(",") + "\n";
+            db.forEach(r => {
+                csv += headers.map(h => `"${r[h] || ""}"`).join(",") + "\n";
+            });
+            const blob = new Blob([csv], {type:'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `HAMIS_DATA_${Date.now()}.csv`;
+            a.click();
+        }
+
+        function clearData() {
+            if(confirm("Confirm deletion of all current session records?")) {
+                localStorage.removeItem('hamis_master_v4');
+                db = [];
+                renderSheet();
+            }
+        }
+    </script>
 </body>
 </html>
