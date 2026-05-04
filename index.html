@@ -12,6 +12,7 @@
 </head>
 <body class="bg-gradient">
   <div class="container">
+    
     <!-- Header -->
     <header class="header">
       <div class="logo-container">
@@ -99,12 +100,13 @@
           </div>
         </div>
 
-        <!-- Location -->
+        <!-- Location - COMPLETE GHANA REGIONS & DISTRICTS -->
         <div class="field-grid">
           <div class="field-group">
             <label class="field-label required">Region</label>
             <select id="region" class="field-input" required onchange="populateDistricts()">
               <option value="">Select Region</option>
+              <!-- Populated by JS -->
             </select>
           </div>
           <div class="field-group">
@@ -171,7 +173,7 @@
           </div>
         </div>
 
-        <!-- ID & Special Status -->
+        <!-- ID & Special Status - FIXED CONDITIONAL LOGIC -->
         <div class="field-grid">
           <div class="field-group">
             <label class="field-label">ID Type</label>
@@ -193,26 +195,31 @@
           </div>
           <div class="field-group">
             <label class="field-label">Refugee Status</label>
-            <select id="refugeeStatus" class="field-input" onchange="toggleRefugeeField()">
+            <select id="refugeeStatus" class="field-input" required onchange="toggleRefugeeField()">
+              <option value="">Select</option>
               <option value="No">No</option>
               <option value="Yes">Yes</option>
             </select>
           </div>
         </div>
 
+        <!-- ✅ FIXED: Refugee Nationality Field (shows only when Refugee Status = Yes) -->
         <div id="nationalityField" class="field-group hidden">
           <label class="field-label">Nationality (if Refugee)</label>
-          <input type="text" id="nationality" class="field-input">
+          <input type="text" id="nationality" class="field-input" placeholder="Country of origin">
         </div>
 
+        <!-- ✅ FIXED: Disability Status with conditional follow-up -->
         <div class="field-grid">
           <div class="field-group">
             <label class="field-label">Disability Status</label>
-            <select id="disabilityStatus" class="field-input" onchange="toggleDisabilityField()">
+            <select id="disabilityStatus" class="field-input" required onchange="toggleDisabilityField()">
+              <option value="">Select</option>
               <option value="No">No</option>
               <option value="Yes">Yes</option>
             </select>
           </div>
+          <!-- ✅ FIXED: Specify Disability (shows only when Disability Status = Yes) -->
           <div id="disabilitySpecField" class="field-group hidden">
             <label class="field-label">Specify Disability</label>
             <select id="disabilitySpecify" class="field-input">
@@ -289,13 +296,14 @@
         </div>
       </section>
 
-      <!-- Section C: Capacity Building (Conditional) -->
+      <!-- Section C: Capacity Building (Conditional) - FIXED -->
       <section class="form-section conditional-section" id="capacitySection">
         <h2 class="section-title">
           <span class="section-badge purple">C</span>
           Capacity Building
         </h2>
         
+        <!-- ✅ FIXED: Training trigger question -->
         <div class="field-group trigger-field">
           <label class="field-label required">Have you been trained by <span id="partnerNameDisplay">the implementing partner</span>?</label>
           <select id="trainedByPartner" class="field-input" required onchange="toggleCapacityFields()">
@@ -305,6 +313,7 @@
           </select>
         </div>
 
+        <!-- ✅ FIXED: Capacity fields container with proper toggle -->
         <div id="capacityFields" class="conditional-content hidden">
           <div class="field-grid">
             <div class="field-group">
@@ -321,11 +330,36 @@
             </div>
             <div class="field-group">
               <label class="field-label required">Mode of Training</label>
-              <select id="trainingMode" class="field-input" required>
+              <select id="trainingMode" class="field-input" required onchange="toggleTrainingModeFields()">
                 <option value="">Select</option>
                 <option value="In-person">In-person</option>
                 <option value="Virtual">Virtual</option>
                 <option value="Hybrid">Hybrid</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ✅ FIXED: Virtual Training Follow-up Fields (were missing) -->
+          <div id="virtualTrainingFields" class="field-group hidden" style="background:#f8fafc;padding:1rem;border-radius:8px;margin:0.5rem 0;">
+            <label class="field-label" style="font-weight:600;color:#0b66c3;">Virtual Training Details</label>
+            <div class="checkbox-grid" style="margin-top:0.5rem;">
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Digital Literacy"> Digital Literacy</label>
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Entrepreneurship"> Entrepreneurship</label>
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Financial Management"> Financial Management</label>
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Agri-Business"> Agri-Business</label>
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="ICT Skills"> ICT Skills</label>
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Soft Skills"> Soft Skills</label>
+              <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Vocational Training"> Vocational Training</label>
+            </div>
+            <div class="field-group" style="margin-top:0.75rem;">
+              <label class="field-label">Virtual Platform Used</label>
+              <select id="virtualPlatform" class="field-input">
+                <option value="">Select</option>
+                <option value="Zoom">Zoom</option>
+                <option value="Google Meet">Google Meet</option>
+                <option value="Microsoft Teams">Microsoft Teams</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>
@@ -368,8 +402,9 @@
             </div>
           </div>
 
+          <!-- Training Modules (Multiple Select) - Always visible when trained -->
           <div class="field-group">
-            <label class="field-label">Training Modules (Select all that apply)</label>
+            <label class="field-label">Training Modules Completed (Select all that apply)</label>
             <div class="checkbox-grid">
               <label class="checkbox-label"><input type="checkbox" name="modules" value="Digital Literacy"> Digital Literacy</label>
               <label class="checkbox-label"><input type="checkbox" name="modules" value="Entrepreneurship"> Entrepreneurship</label>
@@ -401,13 +436,14 @@
         </div>
       </section>
 
-      <!-- Section D: Placement (Conditional) -->
+      <!-- Section D: Placement (Conditional) - FIXED -->
       <section class="form-section conditional-section" id="placementSection">
         <h2 class="section-title">
           <span class="section-badge green">D</span>
           Job Placement
         </h2>
         
+        <!-- ✅ FIXED: Placement trigger question -->
         <div class="field-group trigger-field">
           <label class="field-label required">Were you placed by <span id="partnerNameDisplay2">the implementing partner</span>?</label>
           <select id="placedByPartner" class="field-input" required onchange="togglePlacementFields()">
@@ -417,6 +453,7 @@
           </select>
         </div>
 
+        <!-- ✅ FIXED: Placement fields container with proper toggle -->
         <div id="placementFields" class="conditional-content hidden">
           <div class="field-grid">
             <div class="field-group">
@@ -427,6 +464,7 @@
               <label class="field-label">Placement Location - Region</label>
               <select id="placementRegion" class="field-input" onchange="populatePlacementDistricts()">
                 <option value="">Select Region</option>
+                <!-- Populated by JS -->
               </select>
             </div>
             <div class="field-group">
@@ -441,7 +479,7 @@
             </div>
           </div>
 
-          <!-- Cascading Job Fields -->
+          <!-- Cascading Job Fields - FIXED -->
           <div class="field-grid">
             <div class="field-group">
               <label class="field-label required">Sector</label>
@@ -601,7 +639,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <p>Powered by HAPPY Program • Data Collection Tool v2.0</p>
+      <p>Powered by HAPPY Program • Data Collection Tool v2.1</p>
       <p class="dev-signature">Developed by: Murphy Richards - MERL Manager</p>
     </footer>
   </div>
