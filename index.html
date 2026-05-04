@@ -1,552 +1,1397 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HAPPY Program - Jobberman DQA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b66c3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>HAPPY Program - Jobberman DQA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & BASE ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #1e293b; line-height: 1.5; min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
     
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-        body { background-color: #f8fafc; }
-        .form-section { background: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 5px solid #1e40af; margin-bottom: 1.5rem; padding: 1.5rem; }
-        .label-text { display: block; font-size: 0.65rem; font-weight: 800; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .input-box { width: 100% !important; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.85rem; outline: none; transition: all 0.2s; }
-        .input-box:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
-        .required::after { content: " *"; color: #ef4444; }
-        .conditional-box { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #e2e8f0; }
-        .show { display: block !important; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .sheet-container { overflow: auto; background: white; border: 1px solid #cbd5e1; height: 70vh; }
-        .sheet-table { border-collapse: collapse; width: 100%; font-size: 0.75rem; }
-        .sheet-table th { background: #1e40af; color: white; padding: 8px; position: sticky; top: 0; z-index: 10; border: 1px solid #1e3a8a; }
-        .sheet-table td { padding: 6px; border: 1px solid #e2e8f0; white-space: nowrap; }
-        
-        .auto-field { background-color: #f1f5f9; font-weight: 600; color: #1e40af; }
-    </style>
+    /* ===== HEADER & LOGO ===== */
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+    .logo-container { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #0b66c3 0%, #1e40af 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .logo-svg { width: 28px; height: 28px; color: white; }
+    .logo-img { width: 32px; height: 32px; object-fit: contain; }
+    .app-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+    .app-subtitle { font-size: 0.875rem; color: #64748b; }
+    .collector-info { text-align: right; font-size: 0.875rem; }
+    .collector-label { color: #64748b; margin-right: 0.25rem; }
+    .collector-name { font-weight: 600; color: #0b66c3; }
+    
+    /* ===== STATUS BAR ===== */
+    .status-bar { padding: 0.5rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; text-align: center; font-weight: 500; }
+    .status-bar.online { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .status-bar.offline { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .status-bar.hidden { display: none; }
+    
+    /* ===== FORM CARD ===== */
+    .form-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-bottom: 1.5rem; }
+    
+    /* ===== SECTIONS ===== */
+    .form-section { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; }
+    .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .section-title { display: flex; align-items: center; gap: 0.75rem; font-size: 1.125rem; font-weight: 600; color: #0f172a; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f1f5f9; }
+    .section-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #0b66c3; color: white; border-radius: 6px; font-size: 0.875rem; font-weight: 700; }
+    .section-badge.purple { background: #7c3aed; }
+    .section-badge.green { background: #059669; }
+    
+    /* ===== FIELD GRID ===== */
+    .field-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media (min-width: 640px) { .field-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .field-grid { grid-template-columns: repeat(4, 1fr); } }
+    
+    /* ===== FIELD GROUP ===== */
+    .field-group { display: flex; flex-direction: column; gap: 0.375rem; }
+    .field-group.hidden { display: none; }
+    .field-label { font-size: 0.875rem; font-weight: 500; color: #334155; }
+    .field-label.required::after { content: ' *'; color: #ef4444; }
+    .field-input { padding: 0.625rem 0.875rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9375rem; transition: all 0.2s ease; background: white; }
+    .field-input:focus { outline: none; border-color: #0b66c3; box-shadow: 0 0 0 3px rgba(11, 102, 195, 0.15); }
+    .field-input.readonly { background: #f8fafc; color: #64748b; cursor: not-allowed; }
+    .field-input:disabled { background: #f1f5f9; color: #94a3b8; }
+    .textarea { min-height: 80px; resize: vertical; }
+    
+    /* ===== BADGES ===== */
+    .auto-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #10b981; color: white; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.25rem; vertical-align: middle; }
+    
+    /* ===== CHECKBOX GRID ===== */
+    .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+    @media (min-width: 640px) { .checkbox-grid { grid-template-columns: repeat(4, 1fr); } }
+    .checkbox-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; color: #334155; cursor: pointer; }
+    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: #0b66c3; }
+    
+    /* ===== CONDITIONAL SECTIONS ===== */
+    .conditional-section { background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-top: 1rem; border-left: 4px solid #cbd5e1; }
+    .conditional-section.purple { border-left-color: #7c3aed; }
+    .conditional-section.green { border-left-color: #059669; }
+    .trigger-field { margin-bottom: 1rem; }
+    .conditional-content { padding-top: 1rem; border-top: 1px dashed #cbd5e1; }
+    .conditional-content.hidden { display: none; }
+    
+    /* ===== FORM ACTIONS ===== */
+    .form-actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+    .btn-submit, .btn-reset { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; }
+    .btn-submit { flex: 1; min-width: 200px; background: linear-gradient(135deg, #0b66c3 0%, #1e40af 100%); color: white; }
+    .btn-submit:hover { background: linear-gradient(135deg, #0759b5 0%, #1a3696 100%); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(11, 102, 195, 0.3); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-reset { background: #f1f5f9; color: #475569; }
+    .btn-reset:hover { background: #e2e8f0; }
+    .btn-icon { width: 20px; height: 20px; }
+    
+    /* ===== SUCCESS MESSAGE ===== */
+    .success-message { background: white; border-radius: 16px; padding: 2.5rem; text-align: center; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); margin: 2rem 0; }
+    .success-message.hidden { display: none; }
+    .success-icon { width: 64px; height: 64px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1.5rem; }
+    .success-message h3 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; }
+    .success-message p { color: #64748b; margin-bottom: 0.5rem; }
+    .submission-ref { font-weight: 600; color: #0b66c3; margin-bottom: 1.5rem !important; }
+    
+    /* ===== FOOTER ===== */
+    .footer { text-align: center; padding: 1.5rem 0; color: #64748b; font-size: 0.875rem; }
+    .dev-signature { font-size: 0.75rem; opacity: 0.7; margin-top: 0.25rem; }
+    
+    /* ===== UTILITIES ===== */
+    .hidden { display: none !important; }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .container { padding: 0.75rem; }
+      .form-card { padding: 1rem; }
+      .field-grid { grid-template-columns: 1fr; }
+      .checkbox-grid { grid-template-columns: 1fr 1fr; }
+      .form-actions { flex-direction: column; }
+      .btn-submit, .btn-reset { width: 100%; }
+    }
+    
+    /* ===== TOAST ===== */
+    .toast { position: fixed; bottom: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 10px; color: white; font-weight: 500; font-size: 0.9375rem; z-index: 1000; animation: slideIn 0.3s ease-out; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .toast.toast-info { background: #0b66c3; }
+    .toast.toast-success { background: #059669; }
+    .toast.toast-error { background: #dc2626; }
+    .toast.hidden { display: none; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 0.5rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* ===== MASTER SHEET VIEW ===== */
+    .sheet-container { overflow: auto; background: white; border: 1px solid #cbd5e1; height: 70vh; margin-top: 1rem; border-radius: 8px; }
+    .sheet-table { border-collapse: collapse; width: 100%; font-size: 0.75rem; }
+    .sheet-table th { background: #0b66c3; color: white; padding: 8px; position: sticky; top: 0; z-index: 10; border: 1px solid #074a96; text-align: left; }
+    .sheet-table td { padding: 6px; border: 1px solid #e2e8f0; white-space: nowrap; }
+    .sheet-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    
+    /* ===== LOGIN MODAL ===== */
+    .login-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .login-box { background: white; padding: 2rem; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; }
+    .login-box h3 { margin-bottom: 1rem; color: #0b66c3; }
+    .login-box input { width: 100%; padding: 0.75rem; margin: 0.5rem 0; border: 1px solid #cbd5e1; border-radius: 8px; }
+    .login-box button { width: 100%; padding: 0.75rem; background: #0b66c3; color: white; border: none; border-radius: 8px; font-weight: 600; margin-top: 1rem; cursor: pointer; }
+    .login-box button:hover { background: #0759b5; }
+    
+    /* ===== TABS ===== */
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn { padding: 0.75rem 1.5rem; border: none; background: #f1f5f9; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: #0b66c3; color: white; }
+    .tab-btn:hover:not(.active) { background: #e2e8f0; }
+  </style>
 </head>
-<body class="pb-20">
-
-    <nav class="bg-[#1e40af] text-white p-4 sticky top-0 z-50 flex justify-between items-center shadow-lg">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-            </div>
-            <div>
-                <h1 class="text-sm font-bold tracking-tight">HAPPY Program - Jobberman</h1>
-                <p class="text-[10px] opacity-80">Field Data Collection System</p>
-            </div>
+<body class="bg-gradient">
+  <div class="container">
+    
+    <!-- Header with Jobberman Logo -->
+    <header class="header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <!-- Jobberman Logo: Try image first, fallback to SVG -->
+          <img src="https://jobberman.com/wp-content/uploads/2021/03/jobberman-logo.png" alt="Jobberman" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+          <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display:none">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
         </div>
-        <div class="flex bg-blue-900/40 p-1 rounded-lg">
-            <button onclick="setView('form')" id="btn-form" class="bg-blue-600 px-4 py-1.5 rounded text-xs font-bold transition">Entry Form</button>
-            <button onclick="setView('sheet')" id="btn-sheet" class="px-4 py-1.5 rounded text-xs font-bold transition">Master Sheet</button>
+        <div>
+          <h1 class="app-title">HAPPY Program</h1>
+          <p class="app-subtitle">Jobberman • Field Data Collection</p>
         </div>
-    </nav>
+      </div>
+      <div class="collector-info">
+        <span class="collector-label">Collector:</span>
+        <span id="collectorDisplay" class="collector-name">Not Set</span>
+        <button onclick="showAdminLogin()" class="ml-2 text-xs text-blue-600 hover:underline">🔐 Admin</button>
+      </div>
+    </header>
 
-    <div id="view-form" class="max-w-6xl mx-auto px-4 mt-6">
-        <form id="masterForm" onsubmit="handleFormSubmit(event)">
-            
-            <!-- SECTION A: SYSTEM IDS -->
-            <div class="form-section">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h2 class="text-blue-700 font-black text-sm">SECTION A: SYSTEM METRICS</h2>
-                    <span id="subIdText" class="text-[10px] font-mono text-slate-400 bg-slate-50 px-2 rounded">SUB-AUTO-PENDING</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div><label class="label-text">Collector</label><input type="text" id="collector" class="input-box" placeholder="Your Name"></div>
-                    <div><label class="label-text">Participant ID</label><input type="text" id="participantId" class="input-box auto-field" readonly></div>
-                    <div><label class="label-text">HAMIS Registry ID</label><input type="text" id="hamisId" class="input-box" placeholder="E.g. REG-102"></div>
-                    <div><label class="label-text">Onboarding Date</label><input type="date" id="onbDate" class="input-box"></div>
-                </div>
-            </div>
-
-            <!-- SECTION B: DEMOGRAPHICS -->
-            <div class="form-section" style="border-top-color: #3b82f6;">
-                <h2 class="text-blue-700 font-black text-sm mb-4">SECTION B: PARTICIPANT ONBOARDING</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label class="label-text required">Implementing Partner</label>
-                        <select id="partner" class="input-box" required onchange="updateIds()"></select>
-                    </div>
-                    <div>
-                        <label class="label-text required">Participant Type - Support</label>
-                        <select id="ptSupport" class="input-box" required></select>
-                    </div>
-                    <div>
-                        <label class="label-text">Participant Type - Age</label>
-                        <input type="text" id="ptAge" class="input-box auto-field" readonly placeholder="Auto from DOB">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div><label class="label-text required">Surname</label><input type="text" id="surname" class="input-box" required></div>
-                    <div><label class="label-text required">First Name</label><input type="text" id="firstName" class="input-box" required></div>
-                    <div><label class="label-text">Other Names</label><input type="text" id="otherNames" class="input-box"></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div><label class="label-text required">Sex</label><select id="sex" class="input-box" required></select></div>
-                    <div><label class="label-text required">DOB</label><input type="date" id="dob" class="input-box" required onchange="handleDOBChange()"></div>
-                    <div><label class="label-text">Age</label><input type="text" id="age" class="input-box auto-field" readonly></div>
-                    <div><label class="label-text">Youth Type</label><input type="text" id="youthType" class="input-box auto-field" readonly placeholder="Auto from DOB"></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div><label class="label-text required">Telephone</label><input type="tel" id="tel" class="input-box" required placeholder="024XXXXXXX"></div>
-                    <div>
-                        <label class="label-text required">ID Type</label>
-                        <select id="idType" class="input-box" required onchange="handleIdTypeChange()"></select>
-                        <input type="text" id="idTypeOther" class="input-box mt-2 hidden" placeholder="Specify ID Type">
-                    </div>
-                    <div>
-                        <label class="label-text required">ID Number</label>
-                        <input type="text" id="idNum" class="input-box" required placeholder="Select ID Type first" oninput="formatIdNumber(this)">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label class="label-text required">Education Level</label>
-                        <select id="education" class="input-box" required onchange="handleOtherToggle('education', 'eduOther')"></select>
-                        <input type="text" id="eduOther" class="input-box mt-2 hidden" placeholder="Specify Education">
-                    </div>
-                    <div><label class="label-text required">Region (Origin)</label><select id="region" class="input-box" required onchange="updateDistricts('region','district'); updateIds();"></select></div>
-                    <div><label class="label-text required">District (Origin)</label><select id="district" class="input-box" required disabled></select></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div><label class="label-text required">Community (Origin)</label><input type="text" id="community" class="input-box" required></div>
-                    <div class="md:col-span-1">
-                        <label class="label-text required">Refugee Status</label>
-                        <select id="refugee" class="input-box" required onchange="toggleRefugee()">
-                            <option value="No">No (Ghanaian)</option><option value="Yes">Yes (Refugee)</option>
-                        </select>
-                        <input type="text" id="nationality" class="input-box mt-2 hidden" placeholder="Enter Nationality">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="label-text required">Disability Status</label>
-                        <select id="disability" class="input-box" required onchange="toggleDisability()">
-                            <option value="No">No</option><option value="Yes">Yes</option>
-                        </select>
-                        <input type="text" id="disDetail" class="input-box mt-2 hidden" placeholder="Specify Disability">
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION C: BASELINE WORK -->
-            <div class="form-section" style="border-top-color: #64748b;">
-                <h2 class="text-slate-700 font-black text-sm mb-4">SECTION C: BASELINE EMPLOYMENT (CURRENT)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div><label class="label-text required">Employment Status</label><select id="baseEmpStatus" class="input-box" required onchange="toggleBlock('base_logic', this.value === 'Yes')"></select></div>
-                </div>
-
-                <div id="base_logic" class="conditional-box">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="label-text required">Sector</label><select id="baseSector" class="input-box" onchange="updateSubs('baseSector','baseSub')"></select></div>
-                        <div><label class="label-text required">Industry/Sub</label><select id="baseSub" class="input-box" disabled></select></div>
-                        <div><label class="label-text required">Job Level</label><select id="baseLevel" class="input-box"></select></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="label-text required">Type</label><select id="baseType" class="input-box"></select></div>
-                        <div><label class="label-text required">Category</label><select id="baseCat" class="input-box"></select></div>
-                        <div><label class="label-text">Wage Frequency</label><select id="baseFreq" class="input-box"></select></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="label-text">Wage (GHS)</label><input type="number" id="baseWage" class="input-box"></div>
-                        <div><label class="label-text">Employer</label><input type="text" id="baseEmployer" class="input-box"></div>
-                        <div><label class="label-text">Current Occupation</label><input type="text" id="baseOcc" class="input-box"></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div><label class="label-text">Region of Work</label><select id="baseReg" class="input-box" onchange="updateDistricts('baseReg','baseDist')"></select></div>
-                        <div><label class="label-text">District of Work</label><select id="baseDist" class="input-box" disabled></select></div>
-                        <div><label class="label-text">Town/Community</label><input type="text" id="baseComm" class="input-box"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION D: CAPACITY BUILDING -->
-            <div class="form-section" style="border-top-color: #8b5cf6;">
-                <h2 class="text-purple-700 font-black text-sm mb-4">SECTION D: CAPACITY BUILDING</h2>
-                <div class="bg-purple-50 p-3 rounded mb-4">
-                    <label class="label-text">Has participant been trained by partner?</label>
-                    <div class="flex gap-4 mt-1">
-                        <label class="text-xs font-bold"><input type="radio" name="tr_check" value="Yes" onclick="toggleBlock('tr_logic', true)"> YES</label>
-                        <label class="text-xs font-bold"><input type="radio" name="tr_check" value="No" onclick="toggleBlock('tr_logic', false)" checked> NO</label>
-                    </div>
-                </div>
-                
-                <div id="tr_logic" class="conditional-box">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div><label class="label-text">Start Date</label><input type="date" id="trStart" class="input-box"></div>
-                        <div><label class="label-text">End Date</label><input type="date" id="trEnd" class="input-box"></div>
-                        <div><label class="label-text">Trainer Type</label><select id="trType" class="input-box"></select></div>
-                        <div><label class="label-text">Status</label><select id="trStatus" class="input-box"></select></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="label-text">Sector of Training</label><select id="trSector" class="input-box" onchange="updateSubs('trSector', 'trSub')"></select></div>
-                        <div><label class="label-text">Module/Sub-Sector</label><select id="trSub" class="input-box" disabled></select></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION E: PLACEMENT -->
-            <div class="form-section" style="border-top-color: #10b981;">
-                <h2 class="text-emerald-700 font-black text-sm mb-4">SECTION E: PARTNER PLACEMENT</h2>
-                <div class="bg-emerald-50 p-3 rounded mb-4">
-                    <label class="label-text">Was participant placed in a job?</label>
-                    <div class="flex gap-4 mt-1">
-                        <label class="text-xs font-bold"><input type="radio" name="pl_check" value="Yes" onclick="toggleBlock('pl_logic', true)"> YES</label>
-                        <label class="text-xs font-bold"><input type="radio" name="pl_check" value="No" onclick="toggleBlock('pl_logic', false)" checked> NO</label>
-                    </div>
-                </div>
-
-                <div id="pl_logic" class="conditional-box">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="label-text required">Sector</label><select id="plSector" class="input-box" onchange="updateSubs('plSector','plSub')"></select></div>
-                        <div><label class="label-text required">Industry/Sub</label><select id="plSub" class="input-box" disabled></select></div>
-                        <div><label class="label-text required">Job Level</label><select id="plLevel" class="input-box"></select></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="label-text required">Type</label><select id="plType" class="input-box"></select></div>
-                        <div><label class="label-text required">Category</label><select id="plCat" class="input-box"></select></div>
-                        <div><label class="label-text">Wage Frequency</label><select id="plFreq" class="input-box"></select></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div><label class="label-text">Wage (GHS)</label><input type="number" id="plWage" class="input-box"></div>
-                        <div><label class="label-text">Employer</label><input type="text" id="plEmployer" class="input-box"></div>
-                        <div><label class="label-text">Region of Work</label><select id="plReg" class="input-box" onchange="updateDistricts('plReg','plDist')"></select></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="label-text">District of Work</label><select id="plDist" class="input-box" disabled></select></div>
-                        <div><label class="label-text">Town/Community</label><input type="text" id="plComm" class="input-box"></div>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-800 transition transform active:scale-95 mb-10 uppercase tracking-widest">Submit Records to Registry</button>
-        </form>
+    <!-- Status Bar -->
+    <div id="statusBar" class="status-bar hidden">
+      <span id="statusText"></span>
     </div>
 
-    <div id="view-sheet" class="hidden max-w-full px-2 mt-6">
-        <div class="bg-white p-4 rounded-lg shadow border flex justify-between items-center mb-4">
-            <h2 class="font-black text-blue-800 uppercase text-xs tracking-widest">Master Data Repository</h2>
-            <div class="flex gap-2">
-                <button onclick="exportData()" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded font-bold">EXPORT CSV</button>
-                <button onclick="clearData()" class="bg-red-50 text-red-600 text-[10px] px-3 py-1 rounded font-bold">CLEAR ALL</button>
-            </div>
-        </div>
-        <div class="sheet-container shadow-inner">
-            <table class="sheet-table" id="mainSheet">
-                <thead id="sheetHead"></thead>
-                <tbody id="sheetBody"></tbody>
-            </table>
-        </div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('form')">📝 Entry Form</button>
+      <button class="tab-btn" onclick="showAdminLogin()">📊 Master Sheet</button>
     </div>
 
-    <script>
-        const config = {
-            partners: ["Jobberman", "Agrico", "YouthEmpower", "SkillsGH", "Other"],
-            regions: {
-                "Greater Accra": ["Ablekuma Central", "Ablekuma North", "Ablekuma West", "Accra Metropolitan", "Ada East", "Ada West", "Adenta", "Ashaiman", "Ayawaso East", "Ayawaso North", "Ayawaso West", "Ga Central", "Ga East", "Ga North", "Ga South", "Ga West", "Korle Klottey", "Kpone Katamanso", "Krowor", "La Dade Kotopon", "La Nkwantanang Madina", "Ledzokuku", "Ningo Prampram", "Okaikwei North", "Shai Osudoku", "Tema Metropolitan", "Tema West", "Weija Gbawe"],
-                "Ashanti": ["Adansi Asokwa", "Adansi North", "Adansi South", "Afigya Kwabre North", "Afigya Kwabre South", "Ahafo Ano North", "Ahafo Ano South East", "Ahafo Ano South West", "Amansie Central", "Amansie South", "Amansie West", "Asante Akim Central", "Asante Akim North", "Asante Akim South", "Asokore Mampong", "Atwima Kwanwoma", "Atwima Mponua", "Atwima Nwabiagya North", "Atwima Nwabiagya South", "Bekwai", "Bosome Freho", "Bosomtwe", "Ejisu", "Ejura Sekyedumase", "Juaben", "Kumasi Metropolitan", "Kwabre East", "Kwadaso", "Mampong", "Obuasi East", "Obuasi Municipal", "Offinso Municipal", "Offinso North", "Oforikrom", "Old Tafo", "Sekyere Afram Plains", "Sekyere Central", "Sekyere East", "Sekyere Kumawu", "Sekyere South", "Suame", "Asokwa", "Bantama"],
-                "Eastern": ["Abuakwa North", "Abuakwa South", "Achiase", "Akwapim North", "Akwapim South", "Akyemansa", "Asene Manso Akroso", "Asuogyaman", "Atiwa East", "Atiwa West", "Ayensuano", "Birim North", "Birim South", "Birem Central", "Denkyembour", "Fanteakwa North", "Fanteakwa South", "Kwaebibirem", "Kwahu Afram Plains North", "Kwahu Afram Plains South", "Kwahu East", "Kwahu South", "Kwahu West", "Lower Manya Krobo", "New Juaben North", "New Juaben South", "Nsawam Adoagyiri", "Okere", "Suhum", "Upper Manya Krobo", "Upper West Akim", "Yilo Krobo"],
-                "Volta": ["Adaklu", "Afadzato South", "Agotime-Ziope", "Akatsi North", "Akatsi South", "Anloga", "Central Tongu", "Ho Municipal", "Ho West", "Hohoe Municipal", "Keta Municipal", "Ketu North", "Ketu South", "Kpando Municipal", "North Dayi", "North Tongu", "South Dayi", "South Tongu"],
-                "Northern": ["Gushegu", "Karaga", "Kpandai", "Kumbungu", "Mion", "Nanumba North", "Nanumba South", "Nanton", "Saboba", "Sagnarigu", "Savelugu", "Tamale Metropolitan", "Tatale Sanguli", "Tolon", "Yendi Municipal", "Zabzugu", "North Gonja", "Central Gonja"],
-                "North East": ["Bunkpurugu-Nyankpanduri", "Chereponi", "East Mamprusi", "Mamprugu Moagduri", "West Mamprusi", "Yunyoo-Nasuan"],
-                "Upper West": ["Daffiama-Bussie-Issa", "Jirapa", "Lambussie", "Lawra", "Nadowli-Kaleo", "Nandom", "Sissala East", "Sissala West", "Wa East", "Wa Municipal", "Wa West"],
-                "Upper East": ["Bawku Municipal", "Bawku West", "Binduri", "Bolgatanga East", "Bolgatanga Municipal", "Bongo", "Builsa North", "Builsa South", "Garu", "Kassena-Nankana East", "Kassena-Nankana West", "Nabdam", "Pusiga", "Talensi", "Tempane"],
-                "Oti": ["Biakoye", "Guan", "Jasikan", "Kadjebi", "Krachi East", "Krachi Nchumuru", "Krachi West", "Nkwanta North", "Nkwanta South"],
-                "Bono": ["Banda", "Berekum East", "Berekum West", "Dormaa Central", "Dormaa East", "Dormaa West", "Jaman North", "Jaman South", "Sunyani", "Sunyani West", "Tain", "Wenchi"],
-                "Bono East": ["Atebubu-Amantin", "Kintampo North", "Kintampo South", "Nkoranza North", "Nkoranza South", "Pru East", "Pru West", "Sene East", "Sene West", "Techiman Municipal", "Techiman North"],
-                "Ahafo": ["Asunafo North", "Asunafo South", "Asutifi North", "Asutifi South", "Tano North", "Tano South"],
-                "Savannah": ["Bole", "Central Gonja", "East Gonja", "North East Gonja", "North Gonja", "Sawla-Tuna-Kalba", "West Gonja"],
-                "Western": ["Ahanta West", "Effia-Kwesimintsim", "Ellembelle", "Jomoro", "Mpohor", "Nzema East", "Prestea-Huni Valley", "Sekondi-Takoradi Metropolitan", "Shama", "Tarkwa-Nsuaem", "Wassa Amenfi Central", "Wassa Amenfi East", "Wassa Amenfi West", "Wassa East"],
-                "Western North": ["Aowin", "Bia East", "Bia West", "Bibiani-Anhwiaso-Bekwai", "Bodi", "Juaboso", "Sefwi Akontombra", "Sefwi Wiawso Municipal", "Suaman"],
-                "Central": ["Abura-Asebu-Kwamankese", "Agona East", "Agona West", "Ajumako-Enyan-Essiam", "Asikuma-Odoben-Brakwa", "Assin Central", "Assin North", "Assin South", "Awutu Senya", "Awutu Senya East", "Cape Coast Metropolitan", "Effutu", "Ekumfi", "Gomoa Central", "Gomoa East", "Gomoa West", "Komenda-Edina-Eguafo-Abrem", "Mfantsiman", "Twifo-Atti Morkwa", "Twifo Hemang Lower Denkyira", "Upper Denkyira East", "Upper Denkyira West"]
-            },
-            ptSupport: ["Individual", "Casual Worker", "Enterprises"],
-            education: ["None", "Primary", "JHS", "SHS", "Vocational", "Technical", "University", "College", "Other"],
-            idTypes: ["Ghana Card", "Voter's ID", "Passport", "Other"],
-            empStatus: ["Yes", "No"],
-            jobLevels: ["Management", "Technical", "Administrative", "Support"],
-            trTypes: ["Internal", "External", "Both"],
-            trStatus: ["Complete", "Incomplete"],
-            empType: ["Wage", "Self"],
-            empCat: ["New", "Improved", "Additional"],
-            freq: ["Daily", "Weekly", "Bi-weekly", "Monthly"],
-            sectors: {
-                "Agriculture": ["Rice", "Poultry", "Tomato", "Soybean", "Maize", "Cassava"],
-                "Non-Agriculture": ["Tourism", "ICT", "Construction", "Retail", "Manufacturing", "Health", "Education"]
-            }
-        };
+    <!-- FORM VIEW -->
+    <div id="formView">
+      <form id="questionnaireForm" class="form-card">
+        
+        <!-- Section A: Submission Meta (Auto) -->
+        <section class="form-section">
+          <h2 class="section-title">
+            <span class="section-badge">A</span>
+            Submission Information
+          </h2>
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label">Submission ID <span class="auto-badge">Auto</span></label>
+              <input type="text" id="submissionId" class="field-input readonly" readonly>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Collector Name</label>
+              <input type="text" id="collectorName" class="field-input" required placeholder="Enter your name">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Device ID <span class="auto-badge">Auto</span></label>
+              <input type="text" id="deviceId" class="field-input readonly" readonly>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Submission Timestamp <span class="auto-badge">Auto</span></label>
+              <input type="text" id="submissionTimestamp" class="field-input readonly" readonly>
+            </div>
+          </div>
+        </section>
 
-        const headers = [
-            "Participant ID", "Implementing Partner", "PT-Support", "PT-Age", "Youth-Type", "Surname", "First Name", "Sex", "Age", "Telephone",
-            "ID Type", "ID Number", "Education", "Region", "District", "Refugee", "Disability", 
-            "Baseline-Status", "Baseline-Sector", "Baseline-Sub", "Baseline-Level", "Baseline-Wage",
-            "Trained?", "Tr-Sector", "Tr-Status", "Placed?", "Pl-Sector", "Pl-Sub", "Pl-Level", "Pl-Wage", "Timestamp"
-        ];
+        <!-- Section B: General / Demographics -->
+        <section class="form-section">
+          <h2 class="section-title">
+            <span class="section-badge">B</span>
+            Participant Information
+          </h2>
+          
+          <!-- Participant ID & Partner -->
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label">Participant ID <span class="auto-badge">Auto</span></label>
+              <input type="text" id="participantId" class="field-input readonly" readonly placeholder="Will auto-generate">
+            </div>
+            <div class="field-group">
+              <label class="field-label">HAMIS ID</label>
+              <input type="text" id="hamisId" class="field-input" placeholder="e.g., HAMIS-001">
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Onboarding Date</label>
+              <input type="date" id="onboardingDate" class="field-input" required>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Implementing Partner</label>
+              <select id="implementingPartner" class="field-input" required onchange="onPartnerChange()">
+                <option value="">Select Partner</option>
+                <option value="Jobberman">Jobberman</option>
+                <option value="Agrico">Agrico</option>
+                <option value="YouthEmpower">YouthEmpower</option>
+                <option value="SkillsGH">SkillsGH</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
 
-        let db = JSON.parse(localStorage.getItem('hamis_master_v4')) || [];
+          <!-- Location -->
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label required">Region</label>
+              <select id="region" class="field-input" required onchange="populateDistricts()">
+                <option value="">Select Region</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">District</label>
+              <select id="district" class="field-input" required disabled>
+                <option value="">Select District</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Community</label>
+              <input type="text" id="community" class="field-input" placeholder="Town/Community">
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Location Status</label>
+              <select id="locationStatus" class="field-input" required>
+                <option value="">Select</option>
+                <option value="Urban">Urban</option>
+                <option value="Peri-Urban">Peri-Urban</option>
+                <option value="Rural">Rural</option>
+              </select>
+            </div>
+          </div>
 
-        window.onload = () => {
-            initDropdowns();
-            renderSheet();
-            updateIds();
-        };
+          <!-- Personal Details -->
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label required">Surname</label>
+              <input type="text" id="surname" class="field-input" required>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">First Name</label>
+              <input type="text" id="firstName" class="field-input" required>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Other Name(s)</label>
+              <input type="text" id="otherNames" class="field-input">
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Sex</label>
+              <select id="sex" class="field-input" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
 
-        function initDropdowns() {
-            populate('partner', config.partners);
-            populate('ptSupport', config.ptSupport);
-            populate('sex', ["Male", "Female"]);
-            populate('education', config.education);
-            populate('idType', config.idTypes);
-            populate('region', Object.keys(config.regions));
-            populate('baseReg', Object.keys(config.regions));
-            populate('plReg', Object.keys(config.regions));
-            populate('baseEmpStatus', config.empStatus);
-            populate('baseLevel', config.jobLevels);
-            populate('plLevel', config.jobLevels);
-            populate('baseType', config.empType);
-            populate('plType', config.empType);
-            populate('baseCat', config.empCat);
-            populate('plCat', config.empCat);
-            populate('baseFreq', config.freq);
-            populate('plFreq', config.freq);
-            populate('trType', config.trTypes);
-            populate('trStatus', config.trStatus);
-            populate('trSector', Object.keys(config.sectors));
-            populate('plSector', Object.keys(config.sectors));
-            populate('baseSector', Object.keys(config.sectors));
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label required">Date of Birth</label>
+              <input type="date" id="dob" class="field-input" required onchange="calculateAge()">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Age <span class="auto-badge">Calculated</span></label>
+              <input type="text" id="age" class="field-input readonly" readonly>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Age Group <span class="auto-badge">Auto</span></label>
+              <input type="text" id="participantTypeAge" class="field-input readonly" readonly>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Telephone</label>
+              <input type="tel" id="telephone" class="field-input" required placeholder="0244111111" pattern="0\d{9}">
+            </div>
+          </div>
 
-            const head = document.getElementById('sheetHead');
-            const tr = document.createElement('tr');
-            headers.forEach(h => {
-                const th = document.createElement('th');
-                th.innerText = h;
-                tr.appendChild(th);
-            });
-            head.appendChild(tr);
+          <!-- ID & Special Status -->
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label">ID Type</label>
+              <select id="idType" class="field-input">
+                <option value="">Select</option>
+                <option value="Ghana Card">Ghana Card</option>
+                <option value="Voter's ID">Voter's ID</option>
+                <option value="Passport">Passport</option>
+                <option value="National ID">National ID</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Ghana Card ID</label>
+              <input type="text" id="ghanaCardId" class="field-input" placeholder="GHA-XXXXXXXXX-X">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Voter's ID</label>
+              <input type="text" id="voterId" class="field-input">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Refugee Status</label>
+              <select id="refugeeStatus" class="field-input" onchange="toggleRefugeeField()">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="nationalityField" class="field-group hidden">
+            <label class="field-label">Nationality (if Refugee)</label>
+            <input type="text" id="nationality" class="field-input">
+          </div>
+
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label">Disability Status</label>
+              <select id="disabilityStatus" class="field-input" onchange="toggleDisabilityField()">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div id="disabilitySpecField" class="field-group hidden">
+              <label class="field-label">Specify Disability</label>
+              <select id="disabilitySpecify" class="field-input">
+                <option value="">Select</option>
+                <option value="Hearing">Hearing</option>
+                <option value="Visual">Visual</option>
+                <option value="Speech">Speech</option>
+                <option value="Mobility">Mobility</option>
+                <option value="Albinism">Albinism</option>
+                <option value="Deaf-Blindness">Deaf-Blindness</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Education & Employment -->
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label required">Education Level</label>
+              <select id="educationLevel" class="field-input" required>
+                <option value="">Select</option>
+                <option value="None">None</option>
+                <option value="Primary">Primary</option>
+                <option value="JHS">JHS</option>
+                <option value="SHS">SHS</option>
+                <option value="Vocational">Vocational</option>
+                <option value="Technical">Technical</option>
+                <option value="College">College</option>
+                <option value="University">University</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Employment Status</label>
+              <select id="employmentStatus" class="field-input" required>
+                <option value="">Select</option>
+                <option value="Employed">Employed</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Casual Worker">Casual Worker</option>
+                <option value="Student">Student</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Current Occupation</label>
+              <input type="text" id="currentOccupation" class="field-input" placeholder="e.g., Farmer, Trader">
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label">Monthly Income (GHS)</label>
+              <select id="monthlyIncome" class="field-input">
+                <option value="">Select</option>
+                <option value="None">None</option>
+                <option value="1-200">1-200</option>
+                <option value="201-500">201-500</option>
+                <option value="501-700">501-700</option>
+                <option value="701-1000">701-1000</option>
+                <option value="1001-1200">1001-1200</option>
+                <option value="1201-1500">1201-1500</option>
+                <option value="1501-1700">1501-1700</option>
+                <option value="1701-2000">1701-2000</option>
+                <option value="Above 2000">Above 2000</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Income Frequency</label>
+              <select id="incomeFrequency" class="field-input">
+                <option value="">Select</option>
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section C: Capacity Building (Conditional) -->
+        <section class="form-section conditional-section" id="capacitySection">
+          <h2 class="section-title">
+            <span class="section-badge purple">C</span>
+            Capacity Building
+          </h2>
+          
+          <div class="field-group trigger-field">
+            <label class="field-label required">Have you been trained by <span id="partnerNameDisplay">the implementing partner</span>?</label>
+            <select id="trainedByPartner" class="field-input" required onchange="toggleCapacityFields()">
+              <option value="">Select</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+
+          <div id="capacityFields" class="conditional-content hidden">
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label required">Training Start Date</label>
+                <input type="date" id="trainingStartDate" class="field-input">
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Training End Date</label>
+                <input type="date" id="trainingEndDate" class="field-input">
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Training Location</label>
+                <input type="text" id="trainingLocation" class="field-input" placeholder="Venue/Location">
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Mode of Training</label>
+                <select id="trainingMode" class="field-input" required onchange="toggleTrainingModeFields()">
+                  <option value="">Select</option>
+                  <option value="In-person">In-person</option>
+                  <option value="Virtual">Virtual</option>
+                  <option value="Hybrid">Hybrid</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Virtual Training Follow-up (only shows when Virtual selected) -->
+            <div id="virtualTrainingFields" class="field-group hidden" style="background:#f0f9ff;padding:1rem;border-radius:8px;margin:0.5rem 0;border-left:3px solid #0b66c3">
+              <label class="field-label" style="font-weight:600;color:#0b66c3">🖥️ Virtual Training Details</label>
+              <div class="checkbox-grid" style="margin-top:0.5rem">
+                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Digital Literacy"> Digital Literacy</label>
+                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="ICT Skills"> ICT Skills</label>
+                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="E-Learning"> E-Learning</label>
+                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Online Collaboration"> Online Collaboration</label>
+              </div>
+              <div class="field-group" style="margin-top:0.75rem">
+                <label class="field-label">Virtual Platform Used</label>
+                <select id="virtualPlatform" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Zoom">Zoom</option>
+                  <option value="Google Meet">Google Meet</option>
+                  <option value="Microsoft Teams">Microsoft Teams</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label">Trainer Type</label>
+                <select id="trainerType" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Internal">Internal</option>
+                  <option value="External">External</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Training Partner</label>
+                <select id="trainingPartner" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Jobberman">Jobberman</option>
+                  <option value="Agrico">Agrico</option>
+                  <option value="TVET Authority">TVET Authority</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Completion Status</label>
+                <select id="completionStatus" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Finished">Finished</option>
+                  <option value="Dropped">Dropped</option>
+                  <option value="Ongoing">Ongoing</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Certificate Issued</label>
+                <select id="certificateIssued" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Training Modules Completed (Select all that apply)</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Digital Literacy"> Digital Literacy</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Entrepreneurship"> Entrepreneurship</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Financial Management"> Financial Management</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Agri-Business"> Agri-Business</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="ICT Skills"> ICT Skills</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Soft Skills"> Soft Skills</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Vocational Training"> Vocational Training</label>
+                <label class="checkbox-label"><input type="checkbox" name="modules" value="Other"> Other</label>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">What else would you like to be trained in?</label>
+              <textarea id="wishTraining" class="field-input textarea" rows="3" placeholder="Describe desired training"></textarea>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Have you had any other training before this?</label>
+              <select id="previousTrainings" class="field-input" onchange="togglePreviousTrainingDetails()">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div id="previousTrainingDetails" class="field-group hidden">
+              <label class="field-label">Please describe previous training(s)</label>
+              <textarea id="previousTrainingDesc" class="field-input textarea" rows="3"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section D: Placement (Conditional) -->
+        <section class="form-section conditional-section" id="placementSection">
+          <h2 class="section-title">
+            <span class="section-badge green">D</span>
+            Job Placement
+          </h2>
+          
+          <div class="field-group trigger-field">
+            <label class="field-label required">Were you placed by <span id="partnerNameDisplay2">the implementing partner</span>?</label>
+            <select id="placedByPartner" class="field-input" required onchange="togglePlacementFields()">
+              <option value="">Select</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+
+          <div id="placementFields" class="conditional-content hidden">
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label required">Placement Start Date</label>
+                <input type="date" id="placementStartDate" class="field-input">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Placement Location - Region</label>
+                <select id="placementRegion" class="field-input" onchange="populatePlacementDistricts()">
+                  <option value="">Select Region</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Placement Location - District</label>
+                <select id="placementDistrict" class="field-input" disabled>
+                  <option value="">Select District</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Placement Location - Community</label>
+                <input type="text" id="placementCommunity" class="field-input">
+              </div>
+            </div>
+
+            <!-- Cascading Job Fields -->
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label required">Sector</label>
+                <select id="sector" class="field-input" required onchange="populateIndustries()">
+                  <option value="">Select</option>
+                  <option value="Agriculture">Agriculture</option>
+                  <option value="Non-Agriculture">Non-Agriculture</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Industry</label>
+                <select id="industry" class="field-input" required disabled onchange="populateJobTypes()">
+                  <option value="">Select</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Job Type</label>
+                <select id="jobType" class="field-input" required disabled onchange="populateJobRoles()">
+                  <option value="">Select</option>
+                  <option value="Management">Management</option>
+                  <option value="Technical">Technical</option>
+                  <option value="Administrative">Administrative</option>
+                  <option value="Support">Support</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Job Role</label>
+                <select id="jobRole" class="field-input" required disabled>
+                  <option value="">Select</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label required">Employment Type</label>
+                <select id="employmentType" class="field-input" required>
+                  <option value="">Select</option>
+                  <option value="Wage">Wage Employment</option>
+                  <option value="Self-Employment">Self-Employment</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Employment Category</label>
+                <select id="employmentCategory" class="field-input" required>
+                  <option value="">Select</option>
+                  <option value="New">New Employment</option>
+                  <option value="Improved">Improved Employment</option>
+                  <option value="Additional">Additional Employment</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">Income (GHS)</label>
+                <select id="placementIncome" class="field-input" required>
+                  <option value="">Select</option>
+                  <option value="None">None</option>
+                  <option value="1-200">1-200</option>
+                  <option value="201-500">201-500</option>
+                  <option value="501-700">501-700</option>
+                  <option value="701-1000">701-1000</option>
+                  <option value="1001-1200">1001-1200</option>
+                  <option value="1201-1500">1201-1500</option>
+                  <option value="1501-1700">1501-1700</option>
+                  <option value="1701-2000">1701-2000</option>
+                  <option value="Above 2000">Above 2000</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Income Frequency</label>
+                <select id="placementIncomeFreq" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Daily">Daily</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label">Employer Name</label>
+                <input type="text" id="employerName" class="field-input">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Contract Type</label>
+                <select id="contractType" class="field-input">
+                  <option value="">Select</option>
+                  <option value="Permanent">Permanent</option>
+                  <option value="Fixed-term">Fixed-term</option>
+                  <option value="Casual">Casual</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Internship">Internship</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Work Hours/Week</label>
+                <input type="number" id="workHours" class="field-input" min="1" max="168" placeholder="e.g., 40">
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Employment (if NOT placed by partner) -->
+          <div id="currentEmploymentFields" class="conditional-content hidden">
+            <div class="field-group">
+              <label class="field-label">Are you currently employed elsewhere?</label>
+              <select id="currentlyEmployed" class="field-input" onchange="toggleCurrentEmploymentDetails()">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div id="currentEmploymentDetails" class="hidden">
+              <div class="field-grid">
+                <div class="field-group">
+                  <label class="field-label">Current Employer</label>
+                  <input type="text" id="currentEmployer" class="field-input">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Current Job Role</label>
+                  <input type="text" id="currentJobRoleAlt" class="field-input">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Current Income (GHS)</label>
+                  <select id="currentIncomeAlt" class="field-input">
+                    <option value="">Select</option>
+                    <option value="None">None</option>
+                    <option value="1-200">1-200</option>
+                    <option value="201-500">201-500</option>
+                    <option value="501-1000">501-1000</option>
+                    <option value="1001+">1001+</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="button" id="submitBtn" class="btn-submit" onclick="submitForm()">
+            <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Submit to Google Sheet
+          </button>
+          <button type="button" class="btn-reset" onclick="resetForm()">Reset Form</button>
+        </div>
+      </form>
+
+      <!-- Success Message -->
+      <div id="successMessage" class="success-message hidden">
+        <div class="success-icon">✓</div>
+        <h3>Submission Successful!</h3>
+        <p>Your response has been saved to Google Sheets.</p>
+        <p class="submission-ref">Reference: <span id="refDisplay"></span></p>
+        <button class="btn-submit" onclick="resetForm()">Submit Another</button>
+      </div>
+    </div>
+
+    <!-- MASTER SHEET VIEW (Hidden by default, password protected) -->
+    <div id="sheetView" class="hidden">
+      <div class="form-card">
+        <h2 class="section-title">📊 Master Data Repository</h2>
+        <p class="text-sm text-slate-600 mb-4">View all submitted records from Google Sheets</p>
+        
+        <div class="sheet-controls">
+          <button onclick="loadSheetData()" class="btn-submit" style="padding:0.5rem 1rem;font-size:0.875rem">🔄 Refresh Data</button>
+          <button onclick="exportSheetData()" class="btn-reset" style="padding:0.5rem 1rem;font-size:0.875rem">📥 Export CSV</button>
+          <span id="sheetStatus" class="text-xs text-slate-500"></span>
+        </div>
+        
+        <div class="sheet-container">
+          <table class="sheet-table" id="masterSheet">
+            <thead id="sheetHead"></thead>
+            <tbody id="sheetBody">
+              <tr><td colspan="20" class="text-center py-8 text-slate-500">Loading data from Google Sheets...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Powered by HAPPY Program • Jobberman DQA Tool v2.2</p>
+      <p class="dev-signature">Developed by: Murphy Richards - MERL Manager</p>
+    </footer>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="adminLogin" class="login-modal hidden">
+    <div class="login-box">
+      <h3>🔐 Admin Access</h3>
+      <p class="text-sm text-slate-600 mb-4">Enter password to view Master Sheet</p>
+      <input type="password" id="adminPassword" placeholder="Enter admin password">
+      <button onclick="verifyAdmin()">Unlock Master Sheet</button>
+      <button onclick="closeAdminLogin()" style="background:#f1f5f9;color:#475569;margin-top:0.5rem">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden">
+    <span id="toastMessage">Success!</span>
+  </div>
+
+  <!-- ✅ ALL JAVASCRIPT INLINE -->
+  <script>
+    // ===== CONFIGURATION =====
+    const CONFIG = {
+      // ✅ YOUR DEPLOYED APPS SCRIPT WEB APP URL
+      API_ENDPOINT: 'https://script.google.com/macros/s/AKfycbzKG62FxQvouPswxEiWHob4YZnXY0vc7bZuGRPy2FZkS0SGoWPYbE51ntTiyn531zLdWQ/exec',
+      // ✅ ADMIN PASSWORD (CHANGE THIS TO YOUR SECRET)
+      ADMIN_PASSWORD: 'MurphyMERL2026!',
+      PARTNER_PREFIXES: {
+        'Jobberman': 'JOB', 'Agrico': 'AGR', 'YouthEmpower': 'YOU',
+        'SkillsGH': 'SKI', 'Other': 'OTH'
+      },
+      // ✅ COMPLETE GHANA REGIONS & DISTRICTS (16 regions, 260+ districts)
+      REGIONS: {
+        "Greater Accra": ["Ablekuma Central", "Ablekuma North", "Ablekuma West", "Accra Metropolitan", "Ada East", "Ada West", "Adenta", "Ashaiman", "Ayawaso East", "Ayawaso North", "Ayawaso West", "Ga Central", "Ga East", "Ga North", "Ga South", "Ga West", "Korle Klottey", "Kpone Katamanso", "Krowor", "La Dade Kotopon", "La Nkwantanang Madina", "Ledzokuku", "Ningo Prampram", "Okaikwei North", "Shai Osudoku", "Tema Metropolitan", "Tema West", "Weija Gbawe"],
+        "Ashanti": ["Adansi Asokwa", "Adansi North", "Adansi South", "Afigya Kwabre North", "Afigya Kwabre South", "Ahafo Ano North", "Ahafo Ano South East", "Ahafo Ano South West", "Amansie Central", "Amansie South", "Amansie West", "Asante Akim Central", "Asante Akim North", "Asante Akim South", "Asokore Mampong", "Atwima Kwanwoma", "Atwima Mponua", "Atwima Nwabiagya North", "Atwima Nwabiagya South", "Bekwai", "Bosome Freho", "Bosomtwe", "Ejisu", "Ejura Sekyedumase", "Juaben", "Kumasi Metropolitan", "Kwabre East", "Kwadaso", "Mampong", "Obuasi East", "Obuasi Municipal", "Offinso Municipal", "Offinso North", "Oforikrom", "Old Tafo", "Sekyere Afram Plains", "Sekyere Central", "Sekyere East", "Sekyere Kumawu", "Sekyere South", "Suame", "Asokwa", "Bantama"],
+        "Eastern": ["Abuakwa North", "Abuakwa South", "Achiase", "Akwapim North", "Akwapim South", "Akyemansa", "Asene Manso Akroso", "Asuogyaman", "Atiwa East", "Atiwa West", "Ayensuano", "Birim North", "Birim South", "Birem Central", "Denkyembour", "Fanteakwa North", "Fanteakwa South", "Kwaebibirem", "Kwahu Afram Plains North", "Kwahu Afram Plains South", "Kwahu East", "Kwahu South", "Kwahu West", "Lower Manya Krobo", "New Juaben North", "New Juaben South", "Nsawam Adoagyiri", "Okere", "Suhum", "Upper Manya Krobo", "Upper West Akim", "Yilo Krobo"],
+        "Volta": ["Adaklu", "Afadzato South", "Agotime-Ziope", "Akatsi North", "Akatsi South", "Anloga", "Central Tongu", "Ho Municipal", "Ho West", "Hohoe Municipal", "Keta Municipal", "Ketu North", "Ketu South", "Kpando Municipal", "North Dayi", "North Tongu", "South Dayi", "South Tongu"],
+        "Northern": ["Gushegu", "Karaga", "Kpandai", "Kumbungu", "Mion", "Nanumba North", "Nanumba South", "Nanton", "Saboba", "Sagnarigu", "Savelugu", "Tamale Metropolitan", "Tatale Sanguli", "Tolon", "Yendi Municipal", "Zabzugu", "North Gonja", "Central Gonja"],
+        "North East": ["Bunkpurugu-Nyankpanduri", "Chereponi", "East Mamprusi", "Mamprugu Moagduri", "West Mamprusi", "Yunyoo-Nasuan"],
+        "Upper West": ["Daffiama-Bussie-Issa", "Jirapa", "Lambussie", "Lawra", "Nadowli-Kaleo", "Nandom", "Sissala East", "Sissala West", "Wa East", "Wa Municipal", "Wa West"],
+        "Upper East": ["Bawku Municipal", "Bawku West", "Binduri", "Bolgatanga East", "Bolgatanga Municipal", "Bongo", "Builsa North", "Builsa South", "Garu", "Kassena-Nankana East", "Kassena-Nankana West", "Nabdam", "Pusiga", "Talensi", "Tempane"],
+        "Oti": ["Biakoye", "Guan", "Jasikan", "Kadjebi", "Krachi East", "Krachi Nchumuru", "Krachi West", "Nkwanta North", "Nkwanta South"],
+        "Bono": ["Banda", "Berekum East", "Berekum West", "Dormaa Central", "Dormaa East", "Dormaa West", "Jaman North", "Jaman South", "Sunyani", "Sunyani West", "Tain", "Wenchi"],
+        "Bono East": ["Atebubu-Amantin", "Kintampo North", "Kintampo South", "Nkoranza North", "Nkoranza South", "Pru East", "Pru West", "Sene East", "Sene West", "Techiman Municipal", "Techiman North"],
+        "Ahafo": ["Asunafo North", "Asunafo South", "Asutifi North", "Asutifi South", "Tano North", "Tano South"],
+        "Savannah": ["Bole", "Central Gonja", "East Gonja", "North East Gonja", "North Gonja", "Sawla-Tuna-Kalba", "West Gonja"],
+        "Western": ["Ahanta West", "Effia-Kwesimintsim", "Ellembelle", "Jomoro", "Mpohor", "Nzema East", "Prestea-Huni Valley", "Sekondi-Takoradi Metropolitan", "Shama", "Tarkwa-Nsuaem", "Wassa Amenfi Central", "Wassa Amenfi East", "Wassa Amenfi West", "Wassa East"],
+        "Western North": ["Aowin", "Bia East", "Bia West", "Bibiani-Anhwiaso-Bekwai", "Bodi", "Juaboso", "Sefwi Akontombra", "Sefwi Wiawso Municipal", "Suaman"],
+        "Central": ["Abura-Asebu-Kwamankese", "Agona East", "Agona West", "Ajumako-Enyan-Essiam", "Asikuma-Odoben-Brakwa", "Assin Central", "Assin North", "Assin South", "Awutu Senya", "Awutu Senya East", "Cape Coast Metropolitan", "Effutu", "Ekumfi", "Gomoa Central", "Gomoa East", "Gomoa West", "Komenda-Edina-Eguafo-Abrem", "Mfantsiman", "Twifo-Atti Morkwa", "Twifo Hemang Lower Denkyira", "Upper Denkyira East", "Upper Denkyira West"]
+      },
+      // Sector → Industry → Job Role cascade
+      SECTOR_DATA: {
+        "Agriculture": {
+          "Rice": ["Farm Manager", "Agronomist", "Farm Laborer", "Irrigation Specialist", "Rice Milling Operator"],
+          "Poultry": ["Poultry Farm Manager", "Veterinarian", "Farm Hand", "Feed Specialist", "Egg Collector"],
+          "Tomato": ["Farm Manager", "Horticulture Specialist", "Farm Laborer", "Harvest Coordinator"],
+          "Soybean": ["Farm Manager", "Agronomist", "Farm Laborer", "Processing Technician"],
+          "Maize": ["Farm Manager", "Agronomist", "Farm Laborer", "Storage Manager"],
+          "Cassava": ["Farm Manager", "Processing Specialist", "Farm Laborer"]
+        },
+        "Non-Agriculture": {
+          "Tourism": ["Hotel Manager", "Tour Guide", "Receptionist", "Housekeeping", "Travel Agent"],
+          "ICT": ["IT Manager", "Software Developer", "IT Helpdesk Technician", "Network Engineer", "Data Entry Clerk"],
+          "Construction": ["Project Manager", "Civil Engineer", "Mason", "Electrician", "Plumber", "Carpenter"],
+          "Retail": ["Store Manager", "Sales Associate", "Cashier", "Stock Clerk", "Customer Service Rep"],
+          "Manufacturing": ["Production Manager", "Machine Operator", "Quality Inspector", "Warehouse Staff"],
+          "Health": ["Nurse", "Community Health Worker", "Pharmacy Assistant", "Lab Technician"],
+          "Education": ["Teacher", "Teaching Assistant", "School Administrator", "Tutor"]
         }
+      }
+    };
 
-        function populate(id, list) {
-            const el = document.getElementById(id);
-            el.innerHTML = '<option value="">Select</option>';
-            list.forEach(i => el.add(new Option(i, i)));
-        }
+    // ===== STATE =====
+    let formState = {
+      collectorName: '', deviceId: '', regionCounter: {}, globalSequence: 0, isSubmitting: false, isAdmin: false
+    };
 
-        function handleDOBChange() {
-            const dobVal = document.getElementById('dob').value;
-            if (!dobVal) return;
-            
-            const dob = new Date(dobVal);
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const m = today.getMonth() - dob.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
+    // ===== INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeForm();
+      setupEventListeners();
+      updatePartnerDisplays();
+      
+      // Check if already logged in as admin
+      if (localStorage.getItem('happyAdmin') === 'true') {
+        formState.isAdmin = true;
+        document.querySelector('.tab-btn:nth-child(2)').classList.remove('hidden');
+      }
+    });
 
-            document.getElementById('age').value = age;
+    function initializeForm() {
+      document.getElementById('onboardingDate').valueAsDate = new Date();
+      formState.deviceId = generateDeviceId();
+      document.getElementById('deviceId').value = formState.deviceId;
+      populateRegions();
+      const savedCollector = localStorage.getItem('happyCollector');
+      if (savedCollector) {
+        document.getElementById('collectorName').value = savedCollector;
+        document.getElementById('collectorDisplay').textContent = savedCollector;
+        formState.collectorName = savedCollector;
+      }
+      updateOnlineStatus();
+    }
 
-            const ptAge = document.getElementById('ptAge');
-            const youthType = document.getElementById('youthType');
+    function setupEventListeners() {
+      document.getElementById('collectorName').addEventListener('change', (e) => {
+        formState.collectorName = e.target.value;
+        localStorage.setItem('happyCollector', e.target.value);
+        document.getElementById('collectorDisplay').textContent = e.target.value;
+      });
+      document.getElementById('telephone').addEventListener('blur', validatePhone);
+      document.getElementById('ghanaCardId').addEventListener('blur', validateGhanaCard);
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      document.getElementById('questionnaireForm').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
+      });
+    }
 
-            if (age >= 15 && age <= 35) {
-                ptAge.value = "Youth";
-                if (age <= 17) youthType.value = "15-17";
-                else if (age <= 24) youthType.value = "18-24";
-                else if (age <= 29) youthType.value = "25-29";
-                else youthType.value = "30-35";
-            } else {
-                ptAge.value = age > 35 ? "Non-Youth" : "Underage";
-                youthType.value = "N/A";
-            }
-        }
+    // ===== TAB SWITCHING =====
+    function switchTab(tab) {
+      if (tab === 'form') {
+        document.getElementById('formView').classList.remove('hidden');
+        document.getElementById('sheetView').classList.add('hidden');
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+      }
+    }
 
-        function handleIdTypeChange() {
-            const idType = document.getElementById('idType').value;
-            const idNum = document.getElementById('idNum');
-            
-            handleOtherToggle('idType', 'idTypeOther');
-            
-            if (idType === "Ghana Card") {
-                idNum.placeholder = "GHA-XXXXXXXXX-X";
-                if (!idNum.value.startsWith('GHA-')) {
-                    idNum.value = "GHA-";
-                }
-            } else {
-                idNum.placeholder = "Enter ID Number";
-                if (idNum.value.startsWith('GHA-')) {
-                    idNum.value = "";
-                }
-            }
-        }
+    // ===== ADMIN LOGIN =====
+    function showAdminLogin() {
+      document.getElementById('adminLogin').classList.remove('hidden');
+      document.getElementById('adminPassword').value = '';
+      document.getElementById('adminPassword').focus();
+    }
 
-        function formatIdNumber(input) {
-            const idType = document.getElementById('idType').value;
-            if (idType === "Ghana Card") {
-                let val = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-                
-                if (!val.startsWith('GHA-')) val = "GHA-" + val.replace('GHA', '');
-                
-                if (val.length > 13 && val[13] !== '-') {
-                    val = val.slice(0, 13) + '-' + val.slice(13);
-                }
-                
-                input.value = val.slice(0, 15);
-            }
-        }
+    function closeAdminLogin() {
+      document.getElementById('adminLogin').classList.add('hidden');
+    }
 
-        function handleOtherToggle(selectId, otherId) {
-            const val = document.getElementById(selectId).value;
-            document.getElementById(otherId).classList.toggle('hidden', val !== 'Other');
-        }
+    function verifyAdmin() {
+      const password = document.getElementById('adminPassword').value;
+      if (password === CONFIG.ADMIN_PASSWORD) {
+        formState.isAdmin = true;
+        localStorage.setItem('happyAdmin', 'true');
+        closeAdminLogin();
+        showToast('✅ Admin access granted');
+        loadSheetData();
+        document.getElementById('formView').classList.add('hidden');
+        document.getElementById('sheetView').classList.remove('hidden');
+        document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      } else {
+        showToast('❌ Incorrect password', 'error');
+      }
+    }
 
-        function updateDistricts(regId, distId) {
-            const reg = document.getElementById(regId).value;
-            const dist = document.getElementById(distId);
-            dist.innerHTML = '';
-            if(reg && config.regions[reg]) {
-                config.regions[reg].forEach(d => dist.add(new Option(d, d)));
-                dist.disabled = false;
-            } else { dist.disabled = true; }
-        }
+    // ===== REGION & DISTRICT LOGIC =====
+    function populateRegions() {
+      const select = document.getElementById('region');
+      const placementSelect = document.getElementById('placementRegion');
+      Object.keys(CONFIG.REGIONS).sort().forEach(region => {
+        const opt = document.createElement('option');
+        opt.value = region; opt.textContent = region;
+        select.appendChild(opt.cloneNode(true));
+        placementSelect.appendChild(opt);
+      });
+    }
 
-        function updateSubs(secId, subId) {
-            const sec = document.getElementById(secId).value;
-            const sub = document.getElementById(subId);
-            sub.innerHTML = '';
-            if(sec && config.sectors[sec]) {
-                config.sectors[sec].forEach(s => sub.add(new Option(s, s)));
-                sub.disabled = false;
-            } else { sub.disabled = true; }
-        }
+    function populateDistricts() {
+      const region = document.getElementById('region').value;
+      const select = document.getElementById('district');
+      select.innerHTML = '<option value="">Select District</option>';
+      if (region && CONFIG.REGIONS[region]) {
+        CONFIG.REGIONS[region].sort().forEach(district => {
+          const opt = document.createElement('option');
+          opt.value = district; opt.textContent = district;
+          select.appendChild(opt);
+        });
+        select.disabled = false;
+      } else { select.disabled = true; }
+    }
 
-        function updateIds() {
-            const partner = document.getElementById('partner').value || "IP";
-            const reg = document.getElementById('region').value || "XXX";
-            const pPrefix = partner.substring(0,3).toUpperCase();
-            const pSeq = String(db.length + 1).padStart(7, '0');
-            document.getElementById('participantId').value = `${pPrefix}--${pSeq}`;
+    function populatePlacementDistricts() {
+      const region = document.getElementById('placementRegion').value;
+      const select = document.getElementById('placementDistrict');
+      select.innerHTML = '<option value="">Select District</option>';
+      if (region && CONFIG.REGIONS[region]) {
+        CONFIG.REGIONS[region].sort().forEach(district => {
+          const opt = document.createElement('option');
+          opt.value = district; opt.textContent = district;
+          select.appendChild(opt);
+        });
+        select.disabled = false;
+      } else { select.disabled = true; }
+    }
 
-            const regPrefix = reg.substring(0,3).toUpperCase();
-            const sSeq = String(db.length + 1).padStart(6, '0');
-            const ts = new Date().toISOString().replace(/[-:T.]/g, '').substring(0, 14);
-            document.getElementById('subIdText').innerText = `${regPrefix}-${sSeq}-${ts}`;
-        }
+    // ===== CASCADE LOGIC: Sector → Industry → Job Type → Job Role =====
+    function populateIndustries() {
+      const sector = document.getElementById('sector').value;
+      const industrySelect = document.getElementById('industry');
+      const jobTypeSelect = document.getElementById('jobType');
+      const jobRoleSelect = document.getElementById('jobRole');
+      industrySelect.innerHTML = '<option value="">Select</option>';
+      jobTypeSelect.innerHTML = '<option value="">Select</option><option value="Management">Management</option><option value="Technical">Technical</option><option value="Administrative">Administrative</option><option value="Support">Support</option>';
+      jobRoleSelect.innerHTML = '<option value="">Select</option>';
+      jobTypeSelect.disabled = true; jobRoleSelect.disabled = true;
+      if (sector && CONFIG.SECTOR_DATA[sector]) {
+        Object.keys(CONFIG.SECTOR_DATA[sector]).sort().forEach(industry => {
+          const opt = document.createElement('option');
+          opt.value = industry; opt.textContent = industry;
+          industrySelect.appendChild(opt);
+        });
+        industrySelect.disabled = false;
+      } else { industrySelect.disabled = true; }
+    }
 
-        function toggleRefugee() { document.getElementById('nationality').classList.toggle('hidden', document.getElementById('refugee').value === 'No'); }
-        function toggleDisability() { document.getElementById('disDetail').classList.toggle('hidden', document.getElementById('disability').value === 'No'); }
-        function toggleBlock(id, show) { 
-            const el = document.getElementById(id);
-            el.classList.toggle('show', show);
-            const inputs = el.querySelectorAll('select, input');
-            inputs.forEach(i => {
-                if(show) i.setAttribute('required', '');
-                else i.removeAttribute('required');
-            });
-        }
+    function populateJobTypes() { document.getElementById('jobType').disabled = false; }
 
-        function setView(v) {
-            document.getElementById('view-form').classList.toggle('hidden', v !== 'form');
-            document.getElementById('view-sheet').classList.toggle('hidden', v !== 'sheet');
-            document.getElementById('btn-form').classList.toggle('bg-blue-600', v === 'form');
-            document.getElementById('btn-sheet').classList.toggle('bg-blue-600', v === 'sheet');
-        }
+    function populateJobRoles() {
+      const sector = document.getElementById('sector').value;
+      const industry = document.getElementById('industry').value;
+      const jobType = document.getElementById('jobType').value;
+      const jobRoleSelect = document.getElementById('jobRole');
+      jobRoleSelect.innerHTML = '<option value="">Select</option>';
+      if (sector && industry && jobType && CONFIG.SECTOR_DATA[sector]?.[industry]) {
+        CONFIG.SECTOR_DATA[sector][industry].forEach(role => {
+          const opt = document.createElement('option');
+          opt.value = role; opt.textContent = role;
+          jobRoleSelect.appendChild(opt);
+        });
+        jobRoleSelect.disabled = false;
+      } else { jobRoleSelect.disabled = true; }
+    }
 
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const idType = document.getElementById('idType').value;
-            const idNum = document.getElementById('idNum').value;
-            if(idType === "Ghana Card" && idNum.length !== 15) {
-                alert("Ghana Card ID must be exactly 15 characters (GHA-XXXXXXXXX-X)");
-                return;
-            }
+    // ===== ✅ FIXED: CONDITIONAL FIELD TOGGLES =====
+    function toggleRefugeeField() {
+      const status = document.getElementById('refugeeStatus').value;
+      const field = document.getElementById('nationalityField');
+      field.classList.toggle('hidden', status !== 'Yes');
+    }
 
-            const record = {
-                "Participant ID": document.getElementById('participantId').value,
-                "Implementing Partner": document.getElementById('partner').value,
-                "PT-Support": document.getElementById('ptSupport').value,
-                "PT-Age": document.getElementById('ptAge').value,
-                "Youth-Type": document.getElementById('youthType').value,
-                "Surname": document.getElementById('surname').value,
-                "First Name": document.getElementById('firstName').value,
-                "Sex": document.getElementById('sex').value,
-                "Age": document.getElementById('age').value,
-                "Telephone": document.getElementById('tel').value,
-                "ID Type": idType === 'Other' ? document.getElementById('idTypeOther').value : idType,
-                "ID Number": idNum,
-                "Education": document.getElementById('education').value === 'Other' ? document.getElementById('eduOther').value : document.getElementById('education').value,
-                "Region": document.getElementById('region').value,
-                "District": document.getElementById('district').value,
-                "Refugee": document.getElementById('refugee').value,
-                "Disability": document.getElementById('disability').value,
-                "Baseline-Status": document.getElementById('baseEmpStatus').value,
-                "Baseline-Sector": document.getElementById('baseSector').value,
-                "Baseline-Sub": document.getElementById('baseSub').value,
-                "Baseline-Level": document.getElementById('baseLevel').value,
-                "Baseline-Wage": document.getElementById('baseWage').value,
-                "Trained?": document.querySelector('input[name="tr_check"]:checked').value,
-                "Tr-Sector": document.getElementById('trSector').value,
-                "Tr-Status": document.getElementById('trStatus').value,
-                "Placed?": document.querySelector('input[name="pl_check"]:checked').value,
-                "Pl-Sector": document.getElementById('plSector').value,
-                "Pl-Sub": document.getElementById('plSub').value,
-                "Pl-Level": document.getElementById('plLevel').value,
-                "Pl-Wage": document.getElementById('plWage').value,
-                "Timestamp": new Date().toLocaleString()
-            };
+    function toggleDisabilityField() {
+      const status = document.getElementById('disabilityStatus').value;
+      const field = document.getElementById('disabilitySpecField');
+      field.classList.toggle('hidden', status !== 'Yes');
+    }
 
-            db.push(record);
-            localStorage.setItem('hamis_master_v4', JSON.stringify(db));
-            alert("Record A-AK synchronized with local database.");
-            renderSheet();
-            setView('sheet');
-            document.getElementById('masterForm').reset();
-            updateIds();
-        }
+    function toggleCapacityFields() {
+      const trained = document.getElementById('trainedByPartner').value;
+      const fields = document.getElementById('capacityFields');
+      fields.classList.toggle('hidden', trained !== 'Yes');
+    }
 
-        function renderSheet() {
-            const body = document.getElementById('sheetBody');
-            body.innerHTML = '';
-            db.forEach(r => {
-                const tr = document.createElement('tr');
-                headers.forEach(h => {
-                    const td = document.createElement('td');
-                    td.innerText = r[h] || "-";
-                    tr.appendChild(td);
-                });
-                body.appendChild(tr);
-            });
-        }
+    // ✅ FIXED: Virtual Training Mode → Show modules/platform fields
+    function toggleTrainingModeFields() {
+      const mode = document.getElementById('trainingMode').value;
+      const virtualFields = document.getElementById('virtualTrainingFields');
+      virtualFields.classList.toggle('hidden', mode !== 'Virtual');
+    }
 
-        function exportData() {
-            let csv = headers.join(",") + "\n";
-            db.forEach(r => {
-                csv += headers.map(h => `"${r[h] || ""}"`).join(",") + "\n";
-            });
-            const blob = new Blob([csv], {type:'text/csv'});
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `HAMIS_DATA_${Date.now()}.csv`;
-            a.click();
-        }
+    function togglePlacementFields() {
+      const placed = document.getElementById('placedByPartner').value;
+      const placementFields = document.getElementById('placementFields');
+      const currentEmploymentFields = document.getElementById('currentEmploymentFields');
+      if (placed === 'Yes') {
+        placementFields.classList.remove('hidden');
+        currentEmploymentFields.classList.add('hidden');
+      } else {
+        placementFields.classList.add('hidden');
+        currentEmploymentFields.classList.remove('hidden');
+      }
+    }
 
-        function clearData() {
-            if(confirm("Confirm deletion of all current session records?")) {
-                localStorage.removeItem('hamis_master_v4');
-                db = [];
-                renderSheet();
-            }
-        }
-    </script>
+    function togglePreviousTrainingDetails() {
+      const hasPrevious = document.getElementById('previousTrainings').value;
+      document.getElementById('previousTrainingDetails').classList.toggle('hidden', hasPrevious !== 'Yes');
+    }
+
+    function toggleCurrentEmploymentDetails() {
+      const employed = document.getElementById('currentlyEmployed').value;
+      document.getElementById('currentEmploymentDetails').classList.toggle('hidden', employed !== 'Yes');
+    }
+
+    // ===== CALCULATIONS =====
+    function calculateAge() {
+      const dob = document.getElementById('dob').value;
+      if (!dob) { document.getElementById('age').value = ''; document.getElementById('participantTypeAge').value = ''; return; }
+      const birthDate = new Date(dob); const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+      document.getElementById('age').value = age;
+      document.getElementById('participantTypeAge').value = (age >= 15 && age <= 35) ? 'Youth' : 'Non-Youth';
+    }
+
+    // ===== ID GENERATION =====
+    function onPartnerChange() {
+      const partner = document.getElementById('implementingPartner').value;
+      updatePartnerDisplays();
+      if (partner) {
+        const prefix = CONFIG.PARTNER_PREFIXES[partner] || partner.substring(0, 3).toUpperCase();
+        document.getElementById('participantId').placeholder = `${prefix}--0000001 (will be generated)`;
+      }
+    }
+
+    function updatePartnerDisplays() {
+      const partner = document.getElementById('implementingPartner').value;
+      const displayName = partner || 'the implementing partner';
+      document.getElementById('partnerNameDisplay').textContent = displayName;
+      document.getElementById('partnerNameDisplay2').textContent = displayName;
+    }
+
+    function generateSubmissionId(region) {
+      const regionPrefix = region ? region.substring(0, 3).toUpperCase() : 'XXX';
+      const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '').replace('Z', '');
+      if (!formState.regionCounter[regionPrefix]) formState.regionCounter[regionPrefix] = 0;
+      formState.regionCounter[regionPrefix]++;
+      const index = String(formState.regionCounter[regionPrefix]).padStart(6, '0');
+      return `${regionPrefix}-${index}-${timestamp}`;
+    }
+
+    function generateDeviceId() {
+      const ua = navigator.userAgent; const platform = navigator.platform; const lang = navigator.language;
+      const hash = `${ua}${platform}${lang}${Date.now()}`.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0); return a & a;
+      }, 0);
+      return `DEV-${Math.abs(hash).toString(36).toUpperCase().substring(0, 8)}`;
+    }
+
+    // ===== VALIDATION =====
+    function validatePhone() {
+      const phone = document.getElementById('telephone').value.replace(/\D/g, '');
+      const field = document.getElementById('telephone');
+      if (phone && !/^0\d{9}$/.test(phone)) {
+        field.setCustomValidity('Phone must be 10 digits starting with 0 (e.g., 0244111111)');
+        field.reportValidity();
+      } else { field.setCustomValidity(''); }
+    }
+
+    function validateGhanaCard() {
+      const id = document.getElementById('ghanaCardId').value.replace(/\D/g, '');
+      const field = document.getElementById('ghanaCardId');
+      if (id && id.length !== 10) {
+        field.setCustomValidity('Ghana Card must contain exactly 10 digits');
+        field.reportValidity();
+      } else { field.setCustomValidity(''); }
+    }
+
+    function validateForm() {
+      const form = document.getElementById('questionnaireForm');
+      const visibleRequired = form.querySelectorAll(':not(.hidden) [required]');
+      let isValid = true;
+      visibleRequired.forEach(field => {
+        if (!field.value.trim()) { isValid = false; field.classList.add('error'); field.reportValidity(); }
+        else { field.classList.remove('error'); }
+      });
+      return isValid && form.checkValidity();
+    }
+
+    // ===== SUBMISSION TO GOOGLE SHEETS =====
+    async function submitForm() {
+      if (formState.isSubmitting) return;
+      if (!validateForm()) { showToast('Please fill all required fields', 'error'); return; }
+      
+      formState.isSubmitting = true;
+      const submitBtn = document.getElementById('submitBtn');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
+      submitBtn.disabled = true;
+      
+      try {
+        const formData = collectFormData();
+        showStatus(navigator.onLine ? '🟢 Online - Syncing to Google Sheets...' : '🔴 Offline - Saving locally...', navigator.onLine ? 'online' : 'offline');
+        
+        const response = await fetch(CONFIG.API_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'OK') {
+          document.getElementById('refDisplay').textContent = result.referenceId || 'N/A';
+          document.getElementById('questionnaireForm').classList.add('hidden');
+          document.getElementById('successMessage').classList.remove('hidden');
+          formState.isSubmitting = false;
+          showToast('✅ Data saved to Google Sheets!', 'success');
+        } else { throw new Error(result.message || 'Submission failed'); }
+      } catch (error) {
+        console.error('Submission error:', error);
+        showToast(`Error: ${error.message}`, 'error');
+        formState.isSubmitting = false;
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      }
+    }
+
+    function collectFormData() {
+      const region = document.getElementById('region').value;
+      const timestamp = new Date().toISOString();
+      const modules = Array.from(document.querySelectorAll('input[name="modules"]:checked')).map(cb => cb.value);
+      const virtualModules = Array.from(document.querySelectorAll('input[name="virtualModules"]:checked')).map(cb => cb.value);
+      
+      return {
+        // Section A: Meta
+        submissionId: generateSubmissionId(region),
+        collectorName: document.getElementById('collectorName').value,
+        deviceId: formState.deviceId,
+        submissionTimestamp: timestamp,
+        // Section B: General
+        hamisId: document.getElementById('hamisId').value,
+        onboardingDate: document.getElementById('onboardingDate').value,
+        implementingPartner: document.getElementById('implementingPartner').value,
+        region: region,
+        district: document.getElementById('district').value,
+        community: document.getElementById('community').value,
+        locationStatus: document.getElementById('locationStatus').value,
+        surname: document.getElementById('surname').value,
+        firstName: document.getElementById('firstName').value,
+        otherNames: document.getElementById('otherNames').value,
+        sex: document.getElementById('sex').value,
+        dob: document.getElementById('dob').value,
+        age: document.getElementById('age').value,
+        participantTypeAge: document.getElementById('participantTypeAge').value,
+        telephone: document.getElementById('telephone').value,
+        idType: document.getElementById('idType').value,
+        ghanaCardId: document.getElementById('ghanaCardId').value,
+        voterId: document.getElementById('voterId').value,
+        refugeeStatus: document.getElementById('refugeeStatus').value,
+        nationality: document.getElementById('nationality').value,
+        disabilityStatus: document.getElementById('disabilityStatus').value,
+        disabilitySpecify: document.getElementById('disabilitySpecify').value,
+        educationLevel: document.getElementById('educationLevel').value,
+        employmentStatus: document.getElementById('employmentStatus').value,
+        currentOccupation: document.getElementById('currentOccupation').value,
+        monthlyIncome: document.getElementById('monthlyIncome').value,
+        incomeFrequency: document.getElementById('incomeFrequency').value,
+        // Section C: Capacity Building
+        trainedByPartner: document.getElementById('trainedByPartner').value,
+        trainingStartDate: document.getElementById('trainingStartDate').value,
+        trainingEndDate: document.getElementById('trainingEndDate').value,
+        trainingLocation: document.getElementById('trainingLocation').value,
+        trainingMode: document.getElementById('trainingMode').value,
+        virtualModules: virtualModules.join(', '),
+        virtualPlatform: document.getElementById('virtualPlatform').value,
+        trainerType: document.getElementById('trainerType').value,
+        trainingPartner: document.getElementById('trainingPartner').value,
+        completionStatus: document.getElementById('completionStatus').value,
+        certificateIssued: document.getElementById('certificateIssued').value,
+        modules: modules.join(', '),
+        wishTraining: document.getElementById('wishTraining').value,
+        previousTrainings: document.getElementById('previousTrainings').value,
+        previousTrainingDesc: document.getElementById('previousTrainingDesc').value,
+        // Section D: Placement
+        placedByPartner: document.getElementById('placedByPartner').value,
+        placementStartDate: document.getElementById('placementStartDate').value,
+        placementRegion: document.getElementById('placementRegion').value,
+        placementDistrict: document.getElementById('placementDistrict').value,
+        placementCommunity: document.getElementById('placementCommunity').value,
+        sector: document.getElementById('sector').value,
+        industry: document.getElementById('industry').value,
+        jobType: document.getElementById('jobType').value,
+        jobRole: document.getElementById('jobRole').value,
+        employmentType: document.getElementById('employmentType').value,
+        employmentCategory: document.getElementById('employmentCategory').value,
+        placementIncome: document.getElementById('placementIncome').value,
+        placementIncomeFreq: document.getElementById('placementIncomeFreq').value,
+        employerName: document.getElementById('employerName').value,
+        contractType: document.getElementById('contractType').value,
+        workHours: document.getElementById('workHours').value,
+        // Current employment (if not placed)
+        currentlyEmployed: document.getElementById('currentlyEmployed').value,
+        currentEmployer: document.getElementById('currentEmployer').value,
+        currentJobRoleAlt: document.getElementById('currentJobRoleAlt').value,
+        currentIncomeAlt: document.getElementById('currentIncomeAlt').value
+      };
+    }
+
+    function resetForm() {
+      document.getElementById('questionnaireForm').reset();
+      document.getElementById('questionnaireForm').classList.remove('hidden');
+      document.getElementById('successMessage').classList.add('hidden');
+      // Reset ALL conditional sections
+      document.getElementById('capacityFields').classList.add('hidden');
+      document.getElementById('placementFields').classList.add('hidden');
+      document.getElementById('currentEmploymentFields').classList.add('hidden');
+      document.getElementById('nationalityField').classList.add('hidden');
+      document.getElementById('disabilitySpecField').classList.add('hidden');
+      document.getElementById('virtualTrainingFields').classList.add('hidden');
+      document.getElementById('previousTrainingDetails').classList.add('hidden');
+      document.getElementById('currentEmploymentDetails').classList.add('hidden');
+      // Reset disables
+      ['district', 'industry', 'jobType', 'jobRole', 'placementDistrict'].forEach(id => {
+        document.getElementById(id).disabled = true;
+      });
+      document.getElementById('onboardingDate').valueAsDate = new Date();
+      document.getElementById('participantId').placeholder = 'Will auto-generate';
+      hideStatus();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Submit to Google Sheet`;
+      formState.isSubmitting = false;
+    }
+
+    // ===== MASTER SHEET FUNCTIONS =====
+    async function loadSheetData() {
+      if (!formState.isAdmin) { showAdminLogin(); return; }
+      
+      const statusEl = document.getElementById('sheetStatus');
+      statusEl.textContent = '🔄 Loading from Google Sheets...';
+      
+      try {
+        // Fetch data from your Google Sheet via Apps Script doGet
+        // Note: Your Apps Script needs a doGet handler that returns sheet data
+        // For now, we'll show a message since your backend may not have this endpoint
+        statusEl.textContent = 'ℹ️ Master Sheet view requires backend doGet endpoint. Contact developer to enable.';
+        
+        // If your backend supports it, uncomment below:
+        /*
+        const response = await fetch(CONFIG.API_ENDPOINT + '?action=getSheetData');
+        const data = await response.json();
+        renderSheet(data);
+        statusEl.textContent = `✅ Loaded ${data.length} records`;
+        */
+      } catch (error) {
+        statusEl.textContent = '❌ Failed to load data';
+        console.error('Sheet load error:', error);
+      }
+    }
+
+    function renderSheet(data) {
+      const head = document.getElementById('sheetHead');
+      const body = document.getElementById('sheetBody');
+      
+      if (!data || data.length === 0) {
+        body.innerHTML = '<tr><td colspan="20" class="text-center py-8 text-slate-500">No data found</td></tr>';
+        return;
+      }
+      
+      // Headers
+      head.innerHTML = '';
+      const headerRow = document.createElement('tr');
+      Object.keys(data[0]).forEach(key => {
+        const th = document.createElement('th');
+        th.textContent = key;
+        headerRow.appendChild(th);
+      });
+      head.appendChild(headerRow);
+      
+      // Rows
+      body.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        Object.values(row).forEach(value => {
+          const td = document.createElement('td');
+          td.textContent = value || '-';
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    function exportSheetData() {
+      showToast('📥 Export feature requires backend support');
+      // Implementation would fetch data and create CSV download
+    }
+
+    // ===== UI UTILITIES =====
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = message;
+      toast.className = `toast toast-${type}`;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    function showStatus(message, type) {
+      const bar = document.getElementById('statusBar');
+      const text = document.getElementById('statusText');
+      text.textContent = message;
+      bar.className = `status-bar ${type}`;
+      bar.classList.remove('hidden');
+    }
+
+    function hideStatus() { document.getElementById('statusBar').classList.add('hidden'); }
+
+    function updateOnlineStatus() {
+      const bar = document.getElementById('statusBar');
+      const text = document.getElementById('statusText');
+      if (navigator.onLine) {
+        text.textContent = '🟢 Online - Data syncs to Google Sheets';
+        bar.className = 'status-bar online';
+      } else {
+        text.textContent = '🔴 Offline - Data saved locally, will sync when online';
+        bar.className = 'status-bar offline';
+      }
+      if (!formState.isSubmitting) setTimeout(() => bar.classList.add('hidden'), 4000);
+    }
+  </script>
 </body>
 </html>
