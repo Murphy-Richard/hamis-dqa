@@ -1,413 +1,700 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0b66c3">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>HAPPY Program - Jobberman DQA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* ===== RESET & BASE ===== */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #1e293b; line-height: 1.5; min-height: 100vh; -webkit-tap-highlight-color: transparent; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
-    
-    /* ===== HEADER & LOGO ===== */
-    .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
-    .logo-container { display: flex; align-items: center; gap: 0.75rem; }
-    .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #0b66c3 0%, #1e40af 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-    .logo-svg { width: 28px; height: 28px; color: white; }
-    .logo-img { width: 32px; height: 32px; object-fit: contain; }
-    .app-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
-    .app-subtitle { font-size: 0.875rem; color: #64748b; }
-    .collector-info { text-align: right; font-size: 0.875rem; }
-    .collector-label { color: #64748b; margin-right: 0.25rem; }
-    .collector-name { font-weight: 600; color: #0b66c3; }
-    
-    /* ===== STATUS BAR ===== */
-    .status-bar { padding: 0.5rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; text-align: center; font-weight: 500; }
-    .status-bar.online { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-    .status-bar.offline { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .status-bar.hidden { display: none; }
-    
-    /* ===== FORM CARD ===== */
-    .form-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-bottom: 1.5rem; }
-    
-    /* ===== SECTIONS ===== */
-    .form-section { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; }
-    .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .section-title { display: flex; align-items: center; gap: 0.75rem; font-size: 1.125rem; font-weight: 600; color: #0f172a; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f1f5f9; }
-    .section-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #0b66c3; color: white; border-radius: 6px; font-size: 0.875rem; font-weight: 700; }
-    .section-badge.purple { background: #7c3aed; }
-    .section-badge.green { background: #059669; }
-    
-    /* ===== FIELD GRID ===== */
-    .field-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    @media (min-width: 640px) { .field-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .field-grid { grid-template-columns: repeat(4, 1fr); } }
-    
-    /* ===== FIELD GROUP ===== */
-    .field-group { display: flex; flex-direction: column; gap: 0.375rem; }
-    .field-group.hidden { display: none; }
-    .field-label { font-size: 0.875rem; font-weight: 500; color: #334155; }
-    .field-label.required::after { content: ' *'; color: #ef4444; }
-    .field-input { padding: 0.625rem 0.875rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9375rem; transition: all 0.2s ease; background: white; }
-    .field-input:focus { outline: none; border-color: #0b66c3; box-shadow: 0 0 0 3px rgba(11, 102, 195, 0.15); }
-    .field-input.readonly { background: #f8fafc; color: #64748b; cursor: not-allowed; }
-    .field-input:disabled { background: #f1f5f9; color: #94a3b8; }
-    .textarea { min-height: 80px; resize: vertical; }
-    
-    /* ===== BADGES ===== */
-    .auto-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #10b981; color: white; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.25rem; vertical-align: middle; }
-    
-    /* ===== CHECKBOX GRID ===== */
-    .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
-    @media (min-width: 640px) { .checkbox-grid { grid-template-columns: repeat(4, 1fr); } }
-    .checkbox-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; color: #334155; cursor: pointer; }
-    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: #0b66c3; }
-    
-    /* ===== CONDITIONAL SECTIONS ===== */
-    .conditional-section { background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-top: 1rem; border-left: 4px solid #cbd5e1; }
-    .conditional-section.purple { border-left-color: #7c3aed; }
-    .conditional-section.green { border-left-color: #059669; }
-    .trigger-field { margin-bottom: 1rem; }
-    .conditional-content { padding-top: 1rem; border-top: 1px dashed #cbd5e1; }
-    .conditional-content.hidden { display: none; }
-    
-    /* ===== FORM ACTIONS ===== */
-    .form-actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
-    .btn-submit, .btn-reset { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; }
-    .btn-submit { flex: 1; min-width: 200px; background: linear-gradient(135deg, #0b66c3 0%, #1e40af 100%); color: white; }
-    .btn-submit:hover { background: linear-gradient(135deg, #0759b5 0%, #1a3696 100%); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(11, 102, 195, 0.3); }
-    .btn-submit:active { transform: translateY(0); }
-    .btn-reset { background: #f1f5f9; color: #475569; }
-    .btn-reset:hover { background: #e2e8f0; }
-    .btn-icon { width: 20px; height: 20px; }
-    
-    /* ===== SUCCESS MESSAGE ===== */
-    .success-message { background: white; border-radius: 16px; padding: 2.5rem; text-align: center; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); margin: 2rem 0; }
-    .success-message.hidden { display: none; }
-    .success-icon { width: 64px; height: 64px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1.5rem; }
-    .success-message h3 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; }
-    .success-message p { color: #64748b; margin-bottom: 0.5rem; }
-    .submission-ref { font-weight: 600; color: #0b66c3; margin-bottom: 1.5rem !important; }
-    
-    /* ===== FOOTER ===== */
-    .footer { text-align: center; padding: 1.5rem 0; color: #64748b; font-size: 0.875rem; }
-    .dev-signature { font-size: 0.75rem; opacity: 0.7; margin-top: 0.25rem; }
-    
-    /* ===== UTILITIES ===== */
-    .hidden { display: none !important; }
-    
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 640px) {
-      .container { padding: 0.75rem; }
-      .form-card { padding: 1rem; }
-      .field-grid { grid-template-columns: 1fr; }
-      .checkbox-grid { grid-template-columns: 1fr 1fr; }
-      .form-actions { flex-direction: column; }
-      .btn-submit, .btn-reset { width: 100%; }
-    }
-    
-    /* ===== TOAST ===== */
-    .toast { position: fixed; bottom: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 10px; color: white; font-weight: 500; font-size: 0.9375rem; z-index: 1000; animation: slideIn 0.3s ease-out; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .toast.toast-info { background: #0b66c3; }
-    .toast.toast-success { background: #059669; }
-    .toast.toast-error { background: #dc2626; }
-    .toast.hidden { display: none; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 0.5rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    /* ===== MASTER SHEET VIEW ===== */
-    .sheet-container { overflow: auto; background: white; border: 1px solid #cbd5e1; height: 70vh; margin-top: 1rem; border-radius: 8px; }
-    .sheet-table { border-collapse: collapse; width: 100%; font-size: 0.75rem; }
-    .sheet-table th { background: #0b66c3; color: white; padding: 8px; position: sticky; top: 0; z-index: 10; border: 1px solid #074a96; text-align: left; }
-    .sheet-table td { padding: 6px; border: 1px solid #e2e8f0; white-space: nowrap; }
-    .sheet-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    
-    /* ===== LOGIN MODAL ===== */
-    .login-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-    .login-box { background: white; padding: 2rem; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; }
-    .login-box h3 { margin-bottom: 1rem; color: #0b66c3; }
-    .login-box input { width: 100%; padding: 0.75rem; margin: 0.5rem 0; border: 1px solid #cbd5e1; border-radius: 8px; }
-    .login-box button { width: 100%; padding: 0.75rem; background: #0b66c3; color: white; border: none; border-radius: 8px; font-weight: 600; margin-top: 1rem; cursor: pointer; }
-    .login-box button:hover { background: #0759b5; }
-    
-    /* ===== TABS ===== */
-    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .tab-btn { padding: 0.75rem 1.5rem; border: none; background: #f1f5f9; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-    .tab-btn.active { background: #0b66c3; color: white; }
-    .tab-btn:hover:not(.active) { background: #e2e8f0; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e40af">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>HAPPY Program - Field Data Collection</title>
+<!-- Favicon & Icons -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+body { background-color: #f8fafc; color: #1e293b; line-height: 1.5; }
+/* ===== NAVIGATION ===== */
+.navbar { background: #1e40af; color: white; padding: 0.75rem 1rem; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.nav-brand { display: flex; align-items: center; gap: 0.5rem; }
+.nav-logo { width: 32px; height: 32px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #1e40af; font-size: 0.75rem; }
+.nav-title { font-size: 0.875rem; font-weight: 700; letter-spacing: 0.025em; }
+.nav-tabs { display: flex; background: rgba(255,255,255,0.15); border-radius: 0.5rem; padding: 0.25rem; }
+.nav-tab { padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; }
+.nav-tab.active { background: white; color: #1e40af; }
+.nav-tab:not(.active):hover { background: rgba(255,255,255,0.2); }
+/* ===== FORM SECTIONS ===== */
+.form-section { background: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.25rem; padding: 1.25rem; border-top: 4px solid #1e40af; }
+.form-section.purple { border-top-color: #7c3aed; }
+.form-section.green { border-top-color: #059669; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+.section-title { font-size: 0.875rem; font-weight: 800; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em; }
+.section-badge { background: #1e40af; color: white; width: 24px; height: 24px; border-radius: 0.375rem; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+.section-badge.purple { background: #7c3aed; }
+.section-badge.green { background: #059669; }
+/* ===== FORM FIELDS ===== */
+.field-grid { display: grid; grid-template-columns: 1fr; gap: 0.875rem; }
+@media (min-width: 768px) { .field-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .field-grid { grid-template-columns: repeat(4, 1fr); } }
+.field-group { display: flex; flex-direction: column; gap: 0.25rem; }
+.field-label { font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
+.field-label.required::after { content: " *"; color: #ef4444; }
+.field-input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.85rem; outline: none; transition: all 0.2s; background: white; }
+.field-input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
+.field-input.readonly { background: #f1f5f9; color: #1e40af; font-weight: 600; cursor: not-allowed; }
+.field-input:disabled { background: #f8fafc; color: #94a3b8; }
+.textarea { min-height: 72px; resize: vertical; }
+.auto-badge { display: inline-block; padding: 0.125rem 0.5rem; background: #10b981; color: white; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 700; margin-left: 0.25rem; vertical-align: middle; }
+/* ===== CONDITIONAL SECTIONS ===== */
+.conditional-box { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #e2e8f0; }
+.conditional-box.show { display: block !important; animation: slideDown 0.3s ease-out; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.conditional-trigger { background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border-left: 3px solid #cbd5e1; }
+.conditional-trigger.purple { border-left-color: #7c3aed; }
+.conditional-trigger.green { border-left-color: #059669; }
+/* ===== CHECKBOX GRID ===== */
+.checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.375rem; margin-top: 0.375rem; }
+@media (min-width: 640px) { .checkbox-grid { grid-template-columns: repeat(3, 1fr); } }
+.checkbox-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: #334155; cursor: pointer; }
+.checkbox-label input[type="checkbox"] { width: 14px; height: 14px; accent-color: #1e40af; }
+/* ===== BUTTONS ===== */
+.btn-primary { width: 100%; background: #1e40af; color: white; font-weight: 700; padding: 0.875rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; }
+.btn-primary:hover { background: #1a3696; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+.btn-secondary { background: #f1f5f9; color: #475569; font-weight: 600; padding: 0.75rem 1.25rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
+.btn-secondary:hover { background: #e2e8f0; }
+.btn-group { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+/* ===== STATUS & TOAST ===== */
+.status-bar { padding: 0.5rem 1rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem; font-weight: 600; text-align: center; }
+.status-bar.online { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.status-bar.offline { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.status-bar.hidden { display: none; }
+.toast { position: fixed; bottom: 1.25rem; right: 1.25rem; padding: 0.75rem 1.25rem; border-radius: 0.5rem; color: white; font-weight: 600; font-size: 0.875rem; z-index: 1000; animation: slideIn 0.3s ease-out; max-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.toast.toast-info { background: #1e40af; }
+.toast.toast-success { background: #059669; }
+.toast.toast-error { background: #dc2626; }
+.toast.hidden { display: none; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 0.5rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* ===== SUCCESS SCREEN ===== */
+.success-screen { background: white; border-radius: 1rem; padding: 2rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin: 1.5rem 0; display: none; }
+.success-screen.show { display: block; animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+.success-icon { width: 56px; height: 56px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 700; margin: 0 auto 1rem; }
+.success-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; }
+.success-ref { font-weight: 600; color: #1e40af; margin: 0.75rem 0 1.5rem; }
+/* ===== MASTER SHEET VIEW ===== */
+.sheet-container { overflow: auto; background: white; border: 1px solid #cbd5e1; height: 65vh; border-radius: 0.5rem; margin-top: 1rem; }
+.sheet-table { border-collapse: collapse; width: 100%; font-size: 0.75rem; }
+.sheet-table th { background: #1e40af; color: white; padding: 0.5rem; position: sticky; top: 0; z-index: 10; border: 1px solid #1e3a8a; font-weight: 700; text-align: left; }
+.sheet-table td { padding: 0.5rem; border: 1px solid #e2e8f0; white-space: nowrap; }
+.sheet-controls { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+/* ===== ADMIN MODAL ===== */
+.admin-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.admin-modal.hidden { display: none; }
+.admin-box { background: white; padding: 1.5rem; border-radius: 0.75rem; max-width: 360px; width: 90%; }
+.admin-box h3 { font-size: 1.125rem; font-weight: 700; color: #1e40af; margin-bottom: 0.75rem; }
+.admin-box input { width: 100%; padding: 0.625rem; margin: 0.5rem 0; border: 1px solid #cbd5e1; border-radius: 0.375rem; font-size: 0.875rem; }
+.admin-box input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
+.admin-box .btn-group { margin-top: 1rem; }
+/* ===== UTILITIES ===== */
+.hidden { display: none !important; }
+.text-xs { font-size: 0.75rem; }
+.text-[10px] { font-size: 0.625rem; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+/* ===== FOOTER ===== */
+.footer { text-align: center; padding: 1.5rem 1rem; color: #64748b; font-size: 0.75rem; margin-top: 2rem; }
+.footer strong { color: #1e40af; }
+</style>
 </head>
-<body class="bg-gradient">
-  <div class="container">
-    
-    <!-- Header with Jobberman Logo -->
-    <header class="header">
-      <div class="logo-container">
-        <div class="logo-icon">
-          <!-- Jobberman Logo: Try image first, fallback to SVG -->
-          <img src="https://jobberman.com/wp-content/uploads/2021/03/jobberman-logo.png" alt="Jobberman" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-          <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display:none">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
+<body class="pb-16">
+<!-- NAVIGATION -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo">JB</div>
+    <h1 class="nav-title">HAPPY PROGRAM • FIELD DATA COLLECTION</h1>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="setView('form')" id="tab-form">📝 Entry</button>
+    <button class="nav-tab" onclick="showAdminLogin()" id="tab-sheet">📊 Master</button>
+  </div>
+</nav>
+
+<!-- STATUS BAR -->
+<div id="statusBar" class="status-bar hidden mx-4 mt-4">
+  <span id="statusText"></span>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="max-w-7xl mx-auto px-4 mt-4">
+  
+  <!-- FORM VIEW -->
+  <div id="view-form">
+    <form id="mainForm" onsubmit="handleSubmit(event)">
+      
+      <!-- SECTION A: SUBMISSION META -->
+      <div class="form-section">
+        <div class="section-header">
+          <h2 class="section-title"><span class="section-badge">A</span> Submission Information</h2>
+          <span id="subIdDisplay" class="text-[10px] font-mono text-slate-400 bg-slate-50 px-2 py-0.5 rounded">SUB-AUTO</span>
         </div>
-        <div>
-          <h1 class="app-title">HAPPY Program</h1>
-          <p class="app-subtitle">Jobberman • Field Data Collection</p>
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Submission ID <span class="auto-badge">Auto</span></label>
+            <input type="text" id="submissionId" class="field-input readonly" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Collector Name</label>
+            <input type="text" id="collectorName" class="field-input" required placeholder="Your name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Device ID <span class="auto-badge">Auto</span></label>
+            <input type="text" id="deviceId" class="field-input readonly" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Timestamp <span class="auto-badge">Auto</span></label>
+            <input type="text" id="submissionTimestamp" class="field-input readonly" readonly>
+          </div>
         </div>
       </div>
-      <div class="collector-info">
-        <span class="collector-label">Collector:</span>
-        <span id="collectorDisplay" class="collector-name">Not Set</span>
-        <button onclick="showAdminLogin()" class="ml-2 text-xs text-blue-600 hover:underline">🔐 Admin</button>
-      </div>
-    </header>
 
-    <!-- Status Bar -->
-    <div id="statusBar" class="status-bar hidden">
-      <span id="statusText"></span>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('form')">📝 Entry Form</button>
-      <button class="tab-btn" onclick="showAdminLogin()">📊 Master Sheet</button>
-    </div>
-
-    <!-- FORM VIEW -->
-    <div id="formView">
-      <form id="questionnaireForm" class="form-card">
+      <!-- SECTION B: PARTICIPANT INFORMATION -->
+      <div class="form-section" style="border-top-color: #3b82f6;">
+        <h2 class="section-title"><span class="section-badge" style="background:#3b82f6">B</span> Participant Information</h2>
         
-        <!-- Section A: Submission Meta (Auto) -->
-        <section class="form-section">
-          <h2 class="section-title">
-            <span class="section-badge">A</span>
-            Submission Information
-          </h2>
+        <!-- IDs & Partner -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Participant ID <span class="auto-badge">Auto</span></label>
+            <input type="text" id="participantId" class="field-input readonly" readonly placeholder="Will auto-generate">
+          </div>
+          <div class="field-group">
+            <label class="field-label">HAMIS ID</label>
+            <input type="text" id="hamisId" class="field-input" placeholder="e.g., HAMIS-001">
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Onboarding Date</label>
+            <input type="date" id="onboardingDate" class="field-input" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Implementing Partner</label>
+            <select id="implementingPartner" class="field-input" required onchange="onPartnerChange()">
+              <option value="">Select Partner</option>
+              <option value="Jobberman">Jobberman</option>
+              <option value="Agrico">Agrico</option>
+              <option value="YouthEmpower">YouthEmpower</option>
+              <option value="SkillsGH">SkillsGH</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label required">Region</label>
+            <select id="region" class="field-input" required onchange="populateDistricts('region','district'); updateIds();">
+              <option value="">Select Region</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label required">District</label>
+            <select id="district" class="field-input" required disabled>
+              <option value="">Select District</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Community</label>
+            <input type="text" id="community" class="field-input" placeholder="Town/Community">
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Location Status</label>
+            <select id="locationStatus" class="field-input" required>
+              <option value="">Select</option>
+              <option value="Urban">Urban</option>
+              <option value="Peri-Urban">Peri-Urban</option>
+              <option value="Rural">Rural</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Personal Details -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label required">Surname</label>
+            <input type="text" id="surname" class="field-input" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label required">First Name</label>
+            <input type="text" id="firstName" class="field-input" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Other Name(s)</label>
+            <input type="text" id="otherNames" class="field-input">
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Sex</label>
+            <select id="sex" class="field-input" required>
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label required">Date of Birth</label>
+            <input type="date" id="dob" class="field-input" required onchange="calculateAge()">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Age <span class="auto-badge">Calc</span></label>
+            <input type="text" id="age" class="field-input readonly" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Age Group <span class="auto-badge">Auto</span></label>
+            <input type="text" id="participantTypeAge" class="field-input readonly" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Telephone</label>
+            <input type="tel" id="telephone" class="field-input" required placeholder="0244111111" onblur="validatePhone(this)">
+          </div>
+        </div>
+
+        <!-- ID & Special Status -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">ID Type</label>
+            <select id="idType" class="field-input" onchange="handleIdTypeChange()">
+              <option value="">Select</option>
+              <option value="Ghana Card">Ghana Card</option>
+              <option value="Voter's ID">Voter's ID</option>
+              <option value="Passport">Passport</option>
+              <option value="National ID">National ID</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Ghana Card ID</label>
+            <input type="text" id="ghanaCardId" class="field-input" placeholder="GHA-XXXXXXXXX-X" oninput="formatGhanaCard(this)">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Voter's ID</label>
+            <input type="text" id="voterId" class="field-input" placeholder="10 characters">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Refugee Status</label>
+            <select id="refugeeStatus" class="field-input" onchange="toggleRefugeeField()">
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+        </div>
+        <div id="nationalityField" class="field-group hidden">
+          <label class="field-label">Nationality (if Refugee)</label>
+          <input type="text" id="nationality" class="field-input">
+        </div>
+
+        <!-- Displacement Fields (NEW) -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Displacement Status</label>
+            <select id="displacementStatus" class="field-input" onchange="toggleDisplacementFields()">
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+          <div id="displacementReasonField" class="field-group hidden">
+            <label class="field-label">Reason for Displacement</label>
+            <select id="displacementReason" class="field-input">
+              <option value="">Select</option>
+              <option value="War/Conflict">War/Conflict</option>
+              <option value="Flood">Flood</option>
+              <option value="Fire">Fire</option>
+              <option value="Natural Disaster">Other Natural Disasters</option>
+              <option value="Non-Natural">Other Non-Natural Disasters</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div id="originalCommunityField" class="field-group hidden">
+            <label class="field-label">Original Community</label>
+            <input type="text" id="originalCommunity" class="field-input">
+          </div>
+          <div id="hostCommunityField" class="field-group hidden">
+            <label class="field-label">Host Community (Current)</label>
+            <input type="text" id="hostCommunity" class="field-input">
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Disability Status</label>
+            <select id="disabilityStatus" class="field-input" onchange="toggleDisabilityField()">
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+          <div id="disabilitySpecField" class="field-group hidden">
+            <label class="field-label">Specify Disability</label>
+            <select id="disabilitySpecify" class="field-input">
+              <option value="">Select</option>
+              <option value="Hearing">Hearing</option>
+              <option value="Visual">Visual</option>
+              <option value="Speech">Speech</option>
+              <option value="Mobility">Mobility</option>
+              <option value="Albinism">Albinism</option>
+              <option value="Deaf-Blindness">Deaf-Blindness</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Education & Employment -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label required">Education Level</label>
+            <select id="educationLevel" class="field-input" required>
+              <option value="">Select</option>
+              <option value="None">None</option>
+              <option value="Primary">Primary</option>
+              <option value="JHS">JHS</option>
+              <option value="SHS">SHS</option>
+              <option value="Vocational">Vocational</option>
+              <option value="Technical">Technical</option>
+              <option value="College">College</option>
+              <option value="University">University</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label required">Employment Status</label>
+            <select id="employmentStatus" class="field-input" required>
+              <option value="">Select</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+              <option value="Casual Worker">Casual Worker</option>
+              <option value="Student">Student</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Current Occupation</label>
+            <input type="text" id="currentOccupation" class="field-input" placeholder="e.g., Farmer, Trader">
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Income (GHS)</label>
+            <select id="monthlyIncome" class="field-input">
+              <option value="">Select</option>
+              <option value="None">None</option>
+              <option value="1-200">1-200</option>
+              <option value="201-500">201-500</option>
+              <option value="501-700">501-700</option>
+              <option value="701-1000">701-1000</option>
+              <option value="1001-1200">1001-1200</option>
+              <option value="1201-1500">1201-1500</option>
+              <option value="1501-1700">1501-1700</option>
+              <option value="1701-2000">1701-2000</option>
+              <option value="Above 2000">Above 2000</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Income Frequency</label>
+            <select id="incomeFrequency" class="field-input">
+              <option value="">Select</option>
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Baseline Employment Cascade (NEW - from your list) -->
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Sector</label>
+            <select id="sector" class="field-input" onchange="populateIndustries()">
+              <option value="">Select</option>
+              <option value="Agriculture">Agriculture</option>
+              <option value="Non-Agriculture">Non-Agriculture</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Industry</label>
+            <select id="industry" class="field-input" disabled onchange="populateJobTypes()">
+              <option value="">Select</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Job Type</label>
+            <select id="jobType" class="field-input" disabled onchange="populateJobRoles()">
+              <option value="">Select</option>
+              <option value="Management">Management</option>
+              <option value="Technical">Technical</option>
+              <option value="Administrative">Administrative</option>
+              <option value="Support">Support</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Job Role</label>
+            <select id="jobRole" class="field-input" disabled>
+              <option value="">Select</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Work Region</label>
+            <select id="workRegion" class="field-input" onchange="populateDistricts('workRegion','workDistrict')">
+              <option value="">Select Region</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Work District</label>
+            <select id="workDistrict" class="field-input" disabled>
+              <option value="">Select District</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Work Community/Town</label>
+            <input type="text" id="workCommunity" class="field-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION C: CAPACITY BUILDING -->
+      <div class="form-section purple">
+        <h2 class="section-title"><span class="section-badge purple">C</span> Capacity Building</h2>
+        
+        <div class="conditional-trigger purple">
+          <label class="field-label required">Have you been trained by <span id="partnerNameDisplay">the implementing partner</span>?</label>
+          <div class="flex gap-4 mt-1">
+            <label class="text-xs font-bold"><input type="radio" name="tr_check" value="Yes" onclick="toggleCapacityFields(true)"> YES</label>
+            <label class="text-xs font-bold"><input type="radio" name="tr_check" value="No" onclick="toggleCapacityFields(false)" checked> NO</label>
+          </div>
+        </div>
+        
+        <div id="capacityFields" class="conditional-box">
           <div class="field-grid">
             <div class="field-group">
-              <label class="field-label">Submission ID <span class="auto-badge">Auto</span></label>
-              <input type="text" id="submissionId" class="field-input readonly" readonly>
+              <label class="field-label required">Training Start Date</label>
+              <input type="date" id="trainingStartDate" class="field-input">
             </div>
             <div class="field-group">
-              <label class="field-label required">Collector Name</label>
-              <input type="text" id="collectorName" class="field-input" required placeholder="Enter your name">
+              <label class="field-label required">Training End Date</label>
+              <input type="date" id="trainingEndDate" class="field-input">
             </div>
             <div class="field-group">
-              <label class="field-label">Device ID <span class="auto-badge">Auto</span></label>
-              <input type="text" id="deviceId" class="field-input readonly" readonly>
+              <label class="field-label required">Training Location</label>
+              <input type="text" id="trainingLocation" class="field-input" placeholder="Venue/Location">
             </div>
             <div class="field-group">
-              <label class="field-label">Submission Timestamp <span class="auto-badge">Auto</span></label>
-              <input type="text" id="submissionTimestamp" class="field-input readonly" readonly>
+              <label class="field-label required">Mode of Training</label>
+              <select id="trainingMode" class="field-input" required onchange="toggleTrainingModeFields()">
+                <option value="">Select</option>
+                <option value="In-person">In-person</option>
+                <option value="Virtual">Virtual</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
             </div>
           </div>
-        </section>
-
-        <!-- Section B: General / Demographics -->
-        <section class="form-section">
-          <h2 class="section-title">
-            <span class="section-badge">B</span>
-            Participant Information
-          </h2>
           
-          <!-- Participant ID & Partner -->
-          <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label">Participant ID <span class="auto-badge">Auto</span></label>
-              <input type="text" id="participantId" class="field-input readonly" readonly placeholder="Will auto-generate">
-            </div>
-            <div class="field-group">
-              <label class="field-label">HAMIS ID</label>
-              <input type="text" id="hamisId" class="field-input" placeholder="e.g., HAMIS-001">
-            </div>
-            <div class="field-group">
-              <label class="field-label required">Onboarding Date</label>
-              <input type="date" id="onboardingDate" class="field-input" required>
-            </div>
-            <div class="field-group">
-              <label class="field-label required">Implementing Partner</label>
-              <select id="implementingPartner" class="field-input" required onchange="onPartnerChange()">
-                <option value="">Select Partner</option>
-                <option value="Jobberman">Jobberman</option>
-                <option value="Agrico">Agrico</option>
-                <option value="YouthEmpower">YouthEmpower</option>
-                <option value="SkillsGH">SkillsGH</option>
+          <!-- Virtual Training Follow-up -->
+          <div id="virtualTrainingFields" class="field-group hidden" style="background:#f0f9ff;padding:0.75rem;border-radius:0.5rem;margin:0.5rem 0;border-left:3px solid #7c3aed">
+            <label class="field-label" style="font-weight:700;color:#7c3aed">🖥️ Virtual Training Details</label>
+            <div class="field-group" style="margin-top:0.5rem">
+              <label class="field-label">Virtual Platform Used</label>
+              <select id="virtualPlatform" class="field-input">
+                <option value="">Select</option>
+                <option value="Google Meet">Google Meet</option>
+                <option value="Microsoft Teams">Teams</option>
+                <option value="Zoom">Zoom</option>
+                <option value="WhatsApp">WhatsApp</option>
                 <option value="Other">Other</option>
               </select>
             </div>
           </div>
-
-          <!-- Location -->
+          
           <div class="field-grid">
             <div class="field-group">
-              <label class="field-label required">Region</label>
-              <select id="region" class="field-input" required onchange="populateDistricts()">
+              <label class="field-label">Trainer Type</label>
+              <select id="trainerType" class="field-input">
+                <option value="">Select</option>
+                <option value="Internal">Internal</option>
+                <option value="External">External</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Training Partner</label>
+              <select id="trainingPartner" class="field-input">
+                <option value="">Select</option>
+                <option value="Jobberman">Jobberman</option>
+                <option value="Agrico">Agrico</option>
+                <option value="TVET Authority">TVET Authority</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Completion Status</label>
+              <select id="completionStatus" class="field-input">
+                <option value="">Select</option>
+                <option value="Completed">Completed</option>
+                <option value="Dropped">Dropped</option>
+                <option value="Ongoing">Ongoing</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Certificate Issued</label>
+              <select id="certificateIssued" class="field-input">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="field-group">
+            <label class="field-label">Training Modules Completed (Select all that apply)</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Soft Skills"> Soft Skills</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Employability"> Employability/Career Essential Skills</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Entrepreneurship"> Small Business & Entrepreneurship</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Digital Literacy"> Digital Literacy/ICT Skills</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Financial Management"> Financial Management</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Agri-Business"> Agri-Business</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Vocational Training"> Vocational Training</label>
+              <label class="checkbox-label"><input type="checkbox" name="modules" value="Other"> Other</label>
+            </div>
+          </div>
+          
+          <div class="field-group">
+            <label class="field-label">What Digital Literacy/ICT Skills training did you have?</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-label"><input type="checkbox" name="digitalSkills" value="Graphic Design"> Graphic Design</label>
+              <label class="checkbox-label"><input type="checkbox" name="digitalSkills" value="Web Development"> Web Development</label>
+              <label class="checkbox-label"><input type="checkbox" name="digitalSkills" value="Data Entry"> Data Entry</label>
+              <label class="checkbox-label"><input type="checkbox" name="digitalSkills" value="Social Media"> Social Media Management</label>
+              <label class="checkbox-label"><input type="checkbox" name="digitalSkills" value="Other"> Other</label>
+            </div>
+          </div>
+          
+          <div class="field-group">
+            <label class="field-label">What else would you like to be trained in?</label>
+            <textarea id="wishTraining" class="field-input textarea" placeholder="Describe desired training"></textarea>
+          </div>
+          
+          <div class="field-group">
+            <label class="field-label">Have you had any other training before this?</label>
+            <select id="previousTrainings" class="field-input" onchange="togglePreviousTrainingDetails()">
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+          <div id="previousTrainingDetails" class="field-group hidden">
+            <label class="field-label">Please describe previous training(s)</label>
+            <textarea id="previousTrainingDesc" class="field-input textarea" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION D: JOB PLACEMENT -->
+      <div class="form-section green">
+        <h2 class="section-title"><span class="section-badge green">D</span> Job Placement</h2>
+        
+        <div class="conditional-trigger green">
+          <label class="field-label required">Were you placed by <span id="partnerNameDisplay2">the implementing partner</span>?</label>
+          <div class="flex gap-4 mt-1">
+            <label class="text-xs font-bold"><input type="radio" name="pl_check" value="Yes" onclick="togglePlacementFields(true)"> YES</label>
+            <label class="text-xs font-bold"><input type="radio" name="pl_check" value="No" onclick="togglePlacementFields(false)" checked> NO</label>
+          </div>
+        </div>
+        
+        <div id="placementFields" class="conditional-box">
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label required">Placement Start Date</label>
+              <input type="date" id="placementStartDate" class="field-input">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Placement Region</label>
+              <select id="placementRegion" class="field-input" onchange="populateDistricts('placementRegion','placementDistrict')">
                 <option value="">Select Region</option>
               </select>
             </div>
             <div class="field-group">
-              <label class="field-label required">District</label>
-              <select id="district" class="field-input" required disabled>
+              <label class="field-label">Placement District</label>
+              <select id="placementDistrict" class="field-input" disabled>
                 <option value="">Select District</option>
               </select>
             </div>
             <div class="field-group">
-              <label class="field-label">Community</label>
-              <input type="text" id="community" class="field-input" placeholder="Town/Community">
-            </div>
-            <div class="field-group">
-              <label class="field-label required">Location Status</label>
-              <select id="locationStatus" class="field-input" required>
-                <option value="">Select</option>
-                <option value="Urban">Urban</option>
-                <option value="Peri-Urban">Peri-Urban</option>
-                <option value="Rural">Rural</option>
-              </select>
+              <label class="field-label">Placement Community</label>
+              <input type="text" id="placementCommunity" class="field-input">
             </div>
           </div>
-
-          <!-- Personal Details -->
+          
+          <!-- Job Cascade for Placement -->
           <div class="field-grid">
             <div class="field-group">
-              <label class="field-label required">Surname</label>
-              <input type="text" id="surname" class="field-input" required>
-            </div>
-            <div class="field-group">
-              <label class="field-label required">First Name</label>
-              <input type="text" id="firstName" class="field-input" required>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Other Name(s)</label>
-              <input type="text" id="otherNames" class="field-input">
-            </div>
-            <div class="field-group">
-              <label class="field-label required">Sex</label>
-              <select id="sex" class="field-input" required>
+              <label class="field-label required">Sector</label>
+              <select id="plSector" class="field-input" required onchange="populatePlacementIndustries()">
                 <option value="">Select</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Non-Agriculture">Non-Agriculture</option>
               </select>
             </div>
-          </div>
-
-          <div class="field-grid">
             <div class="field-group">
-              <label class="field-label required">Date of Birth</label>
-              <input type="date" id="dob" class="field-input" required onchange="calculateAge()">
-            </div>
-            <div class="field-group">
-              <label class="field-label">Age <span class="auto-badge">Calculated</span></label>
-              <input type="text" id="age" class="field-input readonly" readonly>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Age Group <span class="auto-badge">Auto</span></label>
-              <input type="text" id="participantTypeAge" class="field-input readonly" readonly>
-            </div>
-            <div class="field-group">
-              <label class="field-label required">Telephone</label>
-              <input type="tel" id="telephone" class="field-input" required placeholder="0244111111" pattern="0\d{9}">
-            </div>
-          </div>
-
-          <!-- ID & Special Status -->
-          <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label">ID Type</label>
-              <select id="idType" class="field-input">
+              <label class="field-label required">Industry</label>
+              <select id="plIndustry" class="field-input" required disabled onchange="populatePlacementJobTypes()">
                 <option value="">Select</option>
-                <option value="Ghana Card">Ghana Card</option>
-                <option value="Voter's ID">Voter's ID</option>
-                <option value="Passport">Passport</option>
-                <option value="National ID">National ID</option>
               </select>
             </div>
             <div class="field-group">
-              <label class="field-label">Ghana Card ID</label>
-              <input type="text" id="ghanaCardId" class="field-input" placeholder="GHA-XXXXXXXXX-X">
-            </div>
-            <div class="field-group">
-              <label class="field-label">Voter's ID</label>
-              <input type="text" id="voterId" class="field-input">
-            </div>
-            <div class="field-group">
-              <label class="field-label">Refugee Status</label>
-              <select id="refugeeStatus" class="field-input" onchange="toggleRefugeeField()">
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="nationalityField" class="field-group hidden">
-            <label class="field-label">Nationality (if Refugee)</label>
-            <input type="text" id="nationality" class="field-input">
-          </div>
-
-          <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label">Disability Status</label>
-              <select id="disabilityStatus" class="field-input" onchange="toggleDisabilityField()">
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div id="disabilitySpecField" class="field-group hidden">
-              <label class="field-label">Specify Disability</label>
-              <select id="disabilitySpecify" class="field-input">
+              <label class="field-label required">Job Type</label>
+              <select id="plJobType" class="field-input" required disabled onchange="populatePlacementJobRoles()">
                 <option value="">Select</option>
-                <option value="Hearing">Hearing</option>
-                <option value="Visual">Visual</option>
-                <option value="Speech">Speech</option>
-                <option value="Mobility">Mobility</option>
-                <option value="Albinism">Albinism</option>
-                <option value="Deaf-Blindness">Deaf-Blindness</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Education & Employment -->
-          <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label required">Education Level</label>
-              <select id="educationLevel" class="field-input" required>
-                <option value="">Select</option>
-                <option value="None">None</option>
-                <option value="Primary">Primary</option>
-                <option value="JHS">JHS</option>
-                <option value="SHS">SHS</option>
-                <option value="Vocational">Vocational</option>
+                <option value="Management">Management</option>
                 <option value="Technical">Technical</option>
-                <option value="College">College</option>
-                <option value="University">University</option>
+                <option value="Administrative">Administrative</option>
+                <option value="Support">Support</option>
               </select>
             </div>
             <div class="field-group">
-              <label class="field-label required">Employment Status</label>
-              <select id="employmentStatus" class="field-input" required>
+              <label class="field-label required">Job Role</label>
+              <select id="plJobRole" class="field-input" required disabled>
                 <option value="">Select</option>
-                <option value="Employed">Employed</option>
-                <option value="Unemployed">Unemployed</option>
-                <option value="Casual Worker">Casual Worker</option>
-                <option value="Student">Student</option>
               </select>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Current Occupation</label>
-              <input type="text" id="currentOccupation" class="field-input" placeholder="e.g., Farmer, Trader">
             </div>
           </div>
-
+          
           <div class="field-grid">
             <div class="field-group">
-              <label class="field-label">Monthly Income (GHS)</label>
-              <select id="monthlyIncome" class="field-input">
+              <label class="field-label required">Employment Type</label>
+              <select id="employmentType" class="field-input" required>
+                <option value="">Select</option>
+                <option value="Wage">Wage Employment</option>
+                <option value="Self-Employment">Self-Employment</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Employment Category</label>
+              <select id="employmentCategory" class="field-input" required>
+                <option value="">Select</option>
+                <option value="New">New Employment</option>
+                <option value="Improved">Improved Employment</option>
+                <option value="Additional">Additional Employment</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label required">Income (GHS)</label>
+              <select id="placementIncome" class="field-input" required>
                 <option value="">Select</option>
                 <option value="None">None</option>
                 <option value="1-200">1-200</option>
@@ -423,7 +710,7 @@
             </div>
             <div class="field-group">
               <label class="field-label">Income Frequency</label>
-              <select id="incomeFrequency" class="field-input">
+              <select id="placementIncomeFreq" class="field-input">
                 <option value="">Select</option>
                 <option value="Daily">Daily</option>
                 <option value="Weekly">Weekly</option>
@@ -431,967 +718,683 @@
               </select>
             </div>
           </div>
-        </section>
-
-        <!-- Section C: Capacity Building (Conditional) -->
-        <section class="form-section conditional-section" id="capacitySection">
-          <h2 class="section-title">
-            <span class="section-badge purple">C</span>
-            Capacity Building
-          </h2>
           
-          <div class="field-group trigger-field">
-            <label class="field-label required">Have you been trained by <span id="partnerNameDisplay">the implementing partner</span>?</label>
-            <select id="trainedByPartner" class="field-input" required onchange="toggleCapacityFields()">
-              <option value="">Select</option>
-              <option value="No">No</option>
-              <option value="Yes">Yes</option>
-            </select>
-          </div>
-
-          <div id="capacityFields" class="conditional-content hidden">
-            <div class="field-grid">
-              <div class="field-group">
-                <label class="field-label required">Training Start Date</label>
-                <input type="date" id="trainingStartDate" class="field-input">
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Training End Date</label>
-                <input type="date" id="trainingEndDate" class="field-input">
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Training Location</label>
-                <input type="text" id="trainingLocation" class="field-input" placeholder="Venue/Location">
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Mode of Training</label>
-                <select id="trainingMode" class="field-input" required onchange="toggleTrainingModeFields()">
-                  <option value="">Select</option>
-                  <option value="In-person">In-person</option>
-                  <option value="Virtual">Virtual</option>
-                  <option value="Hybrid">Hybrid</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Virtual Training Follow-up (only shows when Virtual selected) -->
-            <div id="virtualTrainingFields" class="field-group hidden" style="background:#f0f9ff;padding:1rem;border-radius:8px;margin:0.5rem 0;border-left:3px solid #0b66c3">
-              <label class="field-label" style="font-weight:600;color:#0b66c3">🖥️ Virtual Training Details</label>
-              <div class="checkbox-grid" style="margin-top:0.5rem">
-                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Digital Literacy"> Digital Literacy</label>
-                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="ICT Skills"> ICT Skills</label>
-                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="E-Learning"> E-Learning</label>
-                <label class="checkbox-label"><input type="checkbox" name="virtualModules" value="Online Collaboration"> Online Collaboration</label>
-              </div>
-              <div class="field-group" style="margin-top:0.75rem">
-                <label class="field-label">Virtual Platform Used</label>
-                <select id="virtualPlatform" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Zoom">Zoom</option>
-                  <option value="Google Meet">Google Meet</option>
-                  <option value="Microsoft Teams">Microsoft Teams</option>
-                  <option value="WhatsApp">WhatsApp</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field-grid">
-              <div class="field-group">
-                <label class="field-label">Trainer Type</label>
-                <select id="trainerType" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Internal">Internal</option>
-                  <option value="External">External</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Training Partner</label>
-                <select id="trainingPartner" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Jobberman">Jobberman</option>
-                  <option value="Agrico">Agrico</option>
-                  <option value="TVET Authority">TVET Authority</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Completion Status</label>
-                <select id="completionStatus" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Finished">Finished</option>
-                  <option value="Dropped">Dropped</option>
-                  <option value="Ongoing">Ongoing</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Certificate Issued</label>
-                <select id="certificateIssued" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </div>
-            </div>
-
+          <div class="field-grid">
             <div class="field-group">
-              <label class="field-label">Training Modules Completed (Select all that apply)</label>
-              <div class="checkbox-grid">
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Digital Literacy"> Digital Literacy</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Entrepreneurship"> Entrepreneurship</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Financial Management"> Financial Management</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Agri-Business"> Agri-Business</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="ICT Skills"> ICT Skills</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Soft Skills"> Soft Skills</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Vocational Training"> Vocational Training</label>
-                <label class="checkbox-label"><input type="checkbox" name="modules" value="Other"> Other</label>
-              </div>
+              <label class="field-label">Employer Name</label>
+              <input type="text" id="employerName" class="field-input">
             </div>
-
             <div class="field-group">
-              <label class="field-label">What else would you like to be trained in?</label>
-              <textarea id="wishTraining" class="field-input textarea" rows="3" placeholder="Describe desired training"></textarea>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Have you had any other training before this?</label>
-              <select id="previousTrainings" class="field-input" onchange="togglePreviousTrainingDetails()">
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
+              <label class="field-label">Contract Type</label>
+              <select id="contractType" class="field-input">
+                <option value="">Select</option>
+                <option value="Permanent">Permanent</option>
+                <option value="Fixed-term">Fixed-term</option>
+                <option value="Casual">Casual</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
               </select>
             </div>
-            <div id="previousTrainingDetails" class="field-group hidden">
-              <label class="field-label">Please describe previous training(s)</label>
-              <textarea id="previousTrainingDesc" class="field-input textarea" rows="3"></textarea>
+            <div class="field-group">
+              <label class="field-label">Work Hours/Week</label>
+              <input type="number" id="workHours" class="field-input" min="1" max="168" placeholder="e.g., 40">
             </div>
           </div>
-        </section>
-
-        <!-- Section D: Placement (Conditional) -->
-        <section class="form-section conditional-section" id="placementSection">
-          <h2 class="section-title">
-            <span class="section-badge green">D</span>
-            Job Placement
-          </h2>
-          
-          <div class="field-group trigger-field">
-            <label class="field-label required">Were you placed by <span id="partnerNameDisplay2">the implementing partner</span>?</label>
-            <select id="placedByPartner" class="field-input" required onchange="togglePlacementFields()">
-              <option value="">Select</option>
+        </div>
+        
+        <!-- Current Employment (if NOT placed) -->
+        <div id="currentEmploymentFields" class="conditional-box">
+          <div class="field-group">
+            <label class="field-label">Are you currently employed elsewhere?</label>
+            <select id="currentlyEmployed" class="field-input" onchange="toggleCurrentEmploymentDetails()">
               <option value="No">No</option>
               <option value="Yes">Yes</option>
             </select>
           </div>
-
-          <div id="placementFields" class="conditional-content hidden">
+          <div id="currentEmploymentDetails" class="hidden">
             <div class="field-grid">
               <div class="field-group">
-                <label class="field-label required">Placement Start Date</label>
-                <input type="date" id="placementStartDate" class="field-input">
+                <label class="field-label">Current Employer</label>
+                <input type="text" id="currentEmployer" class="field-input">
               </div>
               <div class="field-group">
-                <label class="field-label">Placement Location - Region</label>
-                <select id="placementRegion" class="field-input" onchange="populatePlacementDistricts()">
-                  <option value="">Select Region</option>
-                </select>
+                <label class="field-label">Current Job Role</label>
+                <input type="text" id="currentJobRoleAlt" class="field-input">
               </div>
               <div class="field-group">
-                <label class="field-label">Placement Location - District</label>
-                <select id="placementDistrict" class="field-input" disabled>
-                  <option value="">Select District</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Placement Location - Community</label>
-                <input type="text" id="placementCommunity" class="field-input">
-              </div>
-            </div>
-
-            <!-- Cascading Job Fields -->
-            <div class="field-grid">
-              <div class="field-group">
-                <label class="field-label required">Sector</label>
-                <select id="sector" class="field-input" required onchange="populateIndustries()">
-                  <option value="">Select</option>
-                  <option value="Agriculture">Agriculture</option>
-                  <option value="Non-Agriculture">Non-Agriculture</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Industry</label>
-                <select id="industry" class="field-input" required disabled onchange="populateJobTypes()">
-                  <option value="">Select</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Job Type</label>
-                <select id="jobType" class="field-input" required disabled onchange="populateJobRoles()">
-                  <option value="">Select</option>
-                  <option value="Management">Management</option>
-                  <option value="Technical">Technical</option>
-                  <option value="Administrative">Administrative</option>
-                  <option value="Support">Support</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Job Role</label>
-                <select id="jobRole" class="field-input" required disabled>
-                  <option value="">Select</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field-grid">
-              <div class="field-group">
-                <label class="field-label required">Employment Type</label>
-                <select id="employmentType" class="field-input" required>
-                  <option value="">Select</option>
-                  <option value="Wage">Wage Employment</option>
-                  <option value="Self-Employment">Self-Employment</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Employment Category</label>
-                <select id="employmentCategory" class="field-input" required>
-                  <option value="">Select</option>
-                  <option value="New">New Employment</option>
-                  <option value="Improved">Improved Employment</option>
-                  <option value="Additional">Additional Employment</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label required">Income (GHS)</label>
-                <select id="placementIncome" class="field-input" required>
+                <label class="field-label">Current Income (GHS)</label>
+                <select id="currentIncomeAlt" class="field-input">
                   <option value="">Select</option>
                   <option value="None">None</option>
                   <option value="1-200">1-200</option>
                   <option value="201-500">201-500</option>
-                  <option value="501-700">501-700</option>
-                  <option value="701-1000">701-1000</option>
-                  <option value="1001-1200">1001-1200</option>
-                  <option value="1201-1500">1201-1500</option>
-                  <option value="1501-1700">1501-1700</option>
-                  <option value="1701-2000">1701-2000</option>
-                  <option value="Above 2000">Above 2000</option>
+                  <option value="501-1000">501-1000</option>
+                  <option value="1001+">1001+</option>
                 </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Income Frequency</label>
-                <select id="placementIncomeFreq" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Daily">Daily</option>
-                  <option value="Weekly">Weekly</option>
-                  <option value="Monthly">Monthly</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field-grid">
-              <div class="field-group">
-                <label class="field-label">Employer Name</label>
-                <input type="text" id="employerName" class="field-input">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Contract Type</label>
-                <select id="contractType" class="field-input">
-                  <option value="">Select</option>
-                  <option value="Permanent">Permanent</option>
-                  <option value="Fixed-term">Fixed-term</option>
-                  <option value="Casual">Casual</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Internship">Internship</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Work Hours/Week</label>
-                <input type="number" id="workHours" class="field-input" min="1" max="168" placeholder="e.g., 40">
               </div>
             </div>
           </div>
-
-          <!-- Current Employment (if NOT placed by partner) -->
-          <div id="currentEmploymentFields" class="conditional-content hidden">
-            <div class="field-group">
-              <label class="field-label">Are you currently employed elsewhere?</label>
-              <select id="currentlyEmployed" class="field-input" onchange="toggleCurrentEmploymentDetails()">
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div id="currentEmploymentDetails" class="hidden">
-              <div class="field-grid">
-                <div class="field-group">
-                  <label class="field-label">Current Employer</label>
-                  <input type="text" id="currentEmployer" class="field-input">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Current Job Role</label>
-                  <input type="text" id="currentJobRoleAlt" class="field-input">
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Current Income (GHS)</label>
-                  <select id="currentIncomeAlt" class="field-input">
-                    <option value="">Select</option>
-                    <option value="None">None</option>
-                    <option value="1-200">1-200</option>
-                    <option value="201-500">201-500</option>
-                    <option value="501-1000">501-1000</option>
-                    <option value="1001+">1001+</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Submit Button -->
-        <div class="form-actions">
-          <button type="button" id="submitBtn" class="btn-submit" onclick="submitForm()">
-            <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Submit to Google Sheet
-          </button>
-          <button type="button" class="btn-reset" onclick="resetForm()">Reset Form</button>
-        </div>
-      </form>
-
-      <!-- Success Message -->
-      <div id="successMessage" class="success-message hidden">
-        <div class="success-icon">✓</div>
-        <h3>Submission Successful!</h3>
-        <p>Your response has been saved to Google Sheets.</p>
-        <p class="submission-ref">Reference: <span id="refDisplay"></span></p>
-        <button class="btn-submit" onclick="resetForm()">Submit Another</button>
-      </div>
-    </div>
-
-    <!-- MASTER SHEET VIEW (Hidden by default, password protected) -->
-    <div id="sheetView" class="hidden">
-      <div class="form-card">
-        <h2 class="section-title">📊 Master Data Repository</h2>
-        <p class="text-sm text-slate-600 mb-4">View all submitted records from Google Sheets</p>
-        
-        <div class="sheet-controls">
-          <button onclick="loadSheetData()" class="btn-submit" style="padding:0.5rem 1rem;font-size:0.875rem">🔄 Refresh Data</button>
-          <button onclick="exportSheetData()" class="btn-reset" style="padding:0.5rem 1rem;font-size:0.875rem">📥 Export CSV</button>
-          <span id="sheetStatus" class="text-xs text-slate-500"></span>
-        </div>
-        
-        <div class="sheet-container">
-          <table class="sheet-table" id="masterSheet">
-            <thead id="sheetHead"></thead>
-            <tbody id="sheetBody">
-              <tr><td colspan="20" class="text-center py-8 text-slate-500">Loading data from Google Sheets...</td></tr>
-            </tbody>
-          </table>
         </div>
       </div>
-    </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>Powered by HAPPY Program • Jobberman DQA Tool v2.2</p>
-      <p class="dev-signature">Developed by: Murphy Richards - MERL Manager</p>
-    </footer>
-  </div>
+      <!-- Submit Buttons -->
+      <div class="btn-group">
+        <button type="submit" id="submitBtn" class="btn-primary">Submit to Google Sheet</button>
+        <button type="button" class="btn-secondary" onclick="resetForm()">Reset</button>
+      </div>
+    </form>
 
-  <!-- Admin Login Modal -->
-  <div id="adminLogin" class="login-modal hidden">
-    <div class="login-box">
-      <h3>🔐 Admin Access</h3>
-      <p class="text-sm text-slate-600 mb-4">Enter password to view Master Sheet</p>
-      <input type="password" id="adminPassword" placeholder="Enter admin password">
-      <button onclick="verifyAdmin()">Unlock Master Sheet</button>
-      <button onclick="closeAdminLogin()" style="background:#f1f5f9;color:#475569;margin-top:0.5rem">Cancel</button>
+    <!-- Success Screen -->
+    <div id="successScreen" class="success-screen">
+      <div class="success-icon">✓</div>
+      <h3 class="success-title">Submission Successful!</h3>
+      <p>Your response has been saved to Google Sheets.</p>
+      <p class="success-ref">Reference: <span id="refDisplay"></span></p>
+      <button class="btn-primary" onclick="resetForm()">Submit Another</button>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="toast hidden">
-    <span id="toastMessage">Success!</span>
+  <!-- MASTER SHEET VIEW (Hidden, Admin Only) -->
+  <div id="view-sheet" class="hidden">
+    <div class="bg-white p-4 rounded-lg shadow border mb-4">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-black text-blue-800 uppercase text-xs tracking-widest">📊 Master Data Repository</h2>
+        <div class="flex gap-2">
+          <button onclick="loadSheetData()" class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded font-bold">🔄 Refresh</button>
+          <button onclick="exportSheetData()" class="bg-emerald-600 text-white text-[10px] px-3 py-1 rounded font-bold">📥 Export CSV</button>
+        </div>
+      </div>
+      <div class="sheet-container">
+        <table class="sheet-table" id="masterSheet">
+          <thead id="sheetHead"></thead>
+          <tbody id="sheetBody"><tr><td colspan="25" class="text-center py-6 text-slate-500">Click "Refresh" to load data from Google Sheets</td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <!-- ✅ ALL JAVASCRIPT INLINE -->
-  <script>
-    // ===== CONFIGURATION =====
-    const CONFIG = {
-      // ✅ YOUR DEPLOYED APPS SCRIPT WEB APP URL
-      API_ENDPOINT: 'https://script.google.com/macros/s/AKfycbzKG62FxQvouPswxEiWHob4YZnXY0vc7bZuGRPy2FZkS0SGoWPYbE51ntTiyn531zLdWQ/exec',
-      // ✅ ADMIN PASSWORD (CHANGE THIS TO YOUR SECRET)
-      ADMIN_PASSWORD: 'MurphyMERL2026!',
-      PARTNER_PREFIXES: {
-        'Jobberman': 'JOB', 'Agrico': 'AGR', 'YouthEmpower': 'YOU',
-        'SkillsGH': 'SKI', 'Other': 'OTH'
-      },
-      // ✅ COMPLETE GHANA REGIONS & DISTRICTS (16 regions, 260+ districts)
-      REGIONS: {
-        "Greater Accra": ["Ablekuma Central", "Ablekuma North", "Ablekuma West", "Accra Metropolitan", "Ada East", "Ada West", "Adenta", "Ashaiman", "Ayawaso East", "Ayawaso North", "Ayawaso West", "Ga Central", "Ga East", "Ga North", "Ga South", "Ga West", "Korle Klottey", "Kpone Katamanso", "Krowor", "La Dade Kotopon", "La Nkwantanang Madina", "Ledzokuku", "Ningo Prampram", "Okaikwei North", "Shai Osudoku", "Tema Metropolitan", "Tema West", "Weija Gbawe"],
-        "Ashanti": ["Adansi Asokwa", "Adansi North", "Adansi South", "Afigya Kwabre North", "Afigya Kwabre South", "Ahafo Ano North", "Ahafo Ano South East", "Ahafo Ano South West", "Amansie Central", "Amansie South", "Amansie West", "Asante Akim Central", "Asante Akim North", "Asante Akim South", "Asokore Mampong", "Atwima Kwanwoma", "Atwima Mponua", "Atwima Nwabiagya North", "Atwima Nwabiagya South", "Bekwai", "Bosome Freho", "Bosomtwe", "Ejisu", "Ejura Sekyedumase", "Juaben", "Kumasi Metropolitan", "Kwabre East", "Kwadaso", "Mampong", "Obuasi East", "Obuasi Municipal", "Offinso Municipal", "Offinso North", "Oforikrom", "Old Tafo", "Sekyere Afram Plains", "Sekyere Central", "Sekyere East", "Sekyere Kumawu", "Sekyere South", "Suame", "Asokwa", "Bantama"],
-        "Eastern": ["Abuakwa North", "Abuakwa South", "Achiase", "Akwapim North", "Akwapim South", "Akyemansa", "Asene Manso Akroso", "Asuogyaman", "Atiwa East", "Atiwa West", "Ayensuano", "Birim North", "Birim South", "Birem Central", "Denkyembour", "Fanteakwa North", "Fanteakwa South", "Kwaebibirem", "Kwahu Afram Plains North", "Kwahu Afram Plains South", "Kwahu East", "Kwahu South", "Kwahu West", "Lower Manya Krobo", "New Juaben North", "New Juaben South", "Nsawam Adoagyiri", "Okere", "Suhum", "Upper Manya Krobo", "Upper West Akim", "Yilo Krobo"],
-        "Volta": ["Adaklu", "Afadzato South", "Agotime-Ziope", "Akatsi North", "Akatsi South", "Anloga", "Central Tongu", "Ho Municipal", "Ho West", "Hohoe Municipal", "Keta Municipal", "Ketu North", "Ketu South", "Kpando Municipal", "North Dayi", "North Tongu", "South Dayi", "South Tongu"],
-        "Northern": ["Gushegu", "Karaga", "Kpandai", "Kumbungu", "Mion", "Nanumba North", "Nanumba South", "Nanton", "Saboba", "Sagnarigu", "Savelugu", "Tamale Metropolitan", "Tatale Sanguli", "Tolon", "Yendi Municipal", "Zabzugu", "North Gonja", "Central Gonja"],
-        "North East": ["Bunkpurugu-Nyankpanduri", "Chereponi", "East Mamprusi", "Mamprugu Moagduri", "West Mamprusi", "Yunyoo-Nasuan"],
-        "Upper West": ["Daffiama-Bussie-Issa", "Jirapa", "Lambussie", "Lawra", "Nadowli-Kaleo", "Nandom", "Sissala East", "Sissala West", "Wa East", "Wa Municipal", "Wa West"],
-        "Upper East": ["Bawku Municipal", "Bawku West", "Binduri", "Bolgatanga East", "Bolgatanga Municipal", "Bongo", "Builsa North", "Builsa South", "Garu", "Kassena-Nankana East", "Kassena-Nankana West", "Nabdam", "Pusiga", "Talensi", "Tempane"],
-        "Oti": ["Biakoye", "Guan", "Jasikan", "Kadjebi", "Krachi East", "Krachi Nchumuru", "Krachi West", "Nkwanta North", "Nkwanta South"],
-        "Bono": ["Banda", "Berekum East", "Berekum West", "Dormaa Central", "Dormaa East", "Dormaa West", "Jaman North", "Jaman South", "Sunyani", "Sunyani West", "Tain", "Wenchi"],
-        "Bono East": ["Atebubu-Amantin", "Kintampo North", "Kintampo South", "Nkoranza North", "Nkoranza South", "Pru East", "Pru West", "Sene East", "Sene West", "Techiman Municipal", "Techiman North"],
-        "Ahafo": ["Asunafo North", "Asunafo South", "Asutifi North", "Asutifi South", "Tano North", "Tano South"],
-        "Savannah": ["Bole", "Central Gonja", "East Gonja", "North East Gonja", "North Gonja", "Sawla-Tuna-Kalba", "West Gonja"],
-        "Western": ["Ahanta West", "Effia-Kwesimintsim", "Ellembelle", "Jomoro", "Mpohor", "Nzema East", "Prestea-Huni Valley", "Sekondi-Takoradi Metropolitan", "Shama", "Tarkwa-Nsuaem", "Wassa Amenfi Central", "Wassa Amenfi East", "Wassa Amenfi West", "Wassa East"],
-        "Western North": ["Aowin", "Bia East", "Bia West", "Bibiani-Anhwiaso-Bekwai", "Bodi", "Juaboso", "Sefwi Akontombra", "Sefwi Wiawso Municipal", "Suaman"],
-        "Central": ["Abura-Asebu-Kwamankese", "Agona East", "Agona West", "Ajumako-Enyan-Essiam", "Asikuma-Odoben-Brakwa", "Assin Central", "Assin North", "Assin South", "Awutu Senya", "Awutu Senya East", "Cape Coast Metropolitan", "Effutu", "Ekumfi", "Gomoa Central", "Gomoa East", "Gomoa West", "Komenda-Edina-Eguafo-Abrem", "Mfantsiman", "Twifo-Atti Morkwa", "Twifo Hemang Lower Denkyira", "Upper Denkyira East", "Upper Denkyira West"]
-      },
-      // Sector → Industry → Job Role cascade
-      SECTOR_DATA: {
-        "Agriculture": {
-          "Rice": ["Farm Manager", "Agronomist", "Farm Laborer", "Irrigation Specialist", "Rice Milling Operator"],
-          "Poultry": ["Poultry Farm Manager", "Veterinarian", "Farm Hand", "Feed Specialist", "Egg Collector"],
-          "Tomato": ["Farm Manager", "Horticulture Specialist", "Farm Laborer", "Harvest Coordinator"],
-          "Soybean": ["Farm Manager", "Agronomist", "Farm Laborer", "Processing Technician"],
-          "Maize": ["Farm Manager", "Agronomist", "Farm Laborer", "Storage Manager"],
-          "Cassava": ["Farm Manager", "Processing Specialist", "Farm Laborer"]
-        },
-        "Non-Agriculture": {
-          "Tourism": ["Hotel Manager", "Tour Guide", "Receptionist", "Housekeeping", "Travel Agent"],
-          "ICT": ["IT Manager", "Software Developer", "IT Helpdesk Technician", "Network Engineer", "Data Entry Clerk"],
-          "Construction": ["Project Manager", "Civil Engineer", "Mason", "Electrician", "Plumber", "Carpenter"],
-          "Retail": ["Store Manager", "Sales Associate", "Cashier", "Stock Clerk", "Customer Service Rep"],
-          "Manufacturing": ["Production Manager", "Machine Operator", "Quality Inspector", "Warehouse Staff"],
-          "Health": ["Nurse", "Community Health Worker", "Pharmacy Assistant", "Lab Technician"],
-          "Education": ["Teacher", "Teaching Assistant", "School Administrator", "Tutor"]
-        }
-      }
-    };
+</div>
 
-    // ===== STATE =====
-    let formState = {
-      collectorName: '', deviceId: '', regionCounter: {}, globalSequence: 0, isSubmitting: false, isAdmin: false
-    };
+<!-- Footer -->
+<footer class="footer">
+  <p>Powered by HAPPY Program • Data Collection Tool v2.0</p>
+  <p>Developed by: <strong>Murphy Richards</strong> - MERL Manager</p>
+</footer>
 
-    // ===== INITIALIZATION =====
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeForm();
-      setupEventListeners();
-      updatePartnerDisplays();
-      
-      // Check if already logged in as admin
-      if (localStorage.getItem('happyAdmin') === 'true') {
-        formState.isAdmin = true;
-        document.querySelector('.tab-btn:nth-child(2)').classList.remove('hidden');
-      }
+<!-- Admin Login Modal -->
+<div id="adminModal" class="admin-modal hidden">
+  <div class="admin-box">
+    <h3>🔐 Admin Access</h3>
+    <p class="text-xs text-slate-600 mb-2">Enter password to view Master Sheet</p>
+    <input type="password" id="adminPassword" placeholder="Enter admin password">
+    <div class="btn-group">
+      <button onclick="verifyAdmin()" class="btn-primary" style="padding:0.625rem">Unlock</button>
+      <button onclick="closeAdminLogin()" class="btn-secondary" style="padding:0.625rem">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast hidden">
+  <span id="toastMessage"></span>
+</div>
+
+<!-- ✅ JAVASCRIPT LOGIC -->
+<script>
+// ===== CONFIGURATION =====
+const CONFIG = {
+  API_ENDPOINT: 'https://script.google.com/macros/s/AKfycbzKG62FxQvouPswxEiWHob4YZnXY0vc7bZuGRPy2FZkS0SGoWPYbE51ntTiyn531zLdWQ/exec',
+  ADMIN_PASSWORD: 'MurphyMERL2026!',
+  PARTNER_PREFIXES: { 'Jobberman':'JOB', 'Agrico':'AGR', 'YouthEmpower':'YOU', 'SkillsGH':'SKI', 'Other':'OTH' },
+  // Ghana Regions & Districts (16 regions, 260+ districts)
+  REGIONS: {
+    "Greater Accra": ["Accra Metropolitan", "Tema", "Adenta", "Ashaiman", "Ga East", "Ga West", "Ga South", "Ga Central", "La Dade-Kotopon", "Ledzokuku", "Krowor", "Ayawaso West", "Ayawaso East", "Ayawaso North", "Okaikwei North", "Ablekuma North", "Ablekuma Central", "Ablekuma West", "Korle Klottey", "Adabraka", "Osu Klottey", "Ningo-Prampram", "Shai-Osudoku", "Ada East", "Ada West", "Weija-Gbawe", "Kpone-Katamanso"],
+    "Ashanti": ["Kumasi Metropolitan", "Obuasi Municipal", "Ejisu", "Bekwai", "Mampong", "Agona", "Asokore Mampong", "Suame", "Bantama", "Subin", "Oforikrom", "Old Tafo", "Kwadaso", "Nhyiaeso", "Atwima Kwanwoma", "Atwima Nwabiagya", "Afigya Kwabre North", "Afigya Kwabre South", "Asante Akim Central", "Asante Akim North", "Asante Akim South", "Bosome Freho", "Bosomtwe", "Ejura Sekyedumase", "Juaben", "Kwabre East", "Offinso Municipal", "Offinso North", "Sekyere Central", "Sekyere East", "Sekyere South", "Sekyere Afram Plains", "Adansi North", "Adansi South", "Amansie Central", "Amansie West", "Ahafo Ano North", "Ahafo Ano South"],
+    "Eastern": ["Koforidua", "Akropong", "Nkawkaw", "Mpraeso", "Aburi", "Kibi", "Akim Oda", "Asamankese", "Somanya", "Kade", "Begoro", "Donkorkrom", "Akim Swedru", "Asuogyaman", "Atiwa East", "Atiwa West", "Ayensuano", "Birim Central", "Birim North", "Birim South", "Denkyembour", "Fanteakwa North", "Fanteakwa South", "Kwaebibirem", "Kwahu Afram Plains North", "Kwahu Afram Plains South", "Kwahu East", "Kwahu South", "Kwahu West", "Lower Manya Krobo", "New Juaben North", "New Juaben South", "Nsawam Adoagyiri", "Okere", "Suhum", "Upper Manya Krobo", "Upper West Akim", "Yilo Krobo"],
+    "Volta": ["Ho", "Keta", "Hohoe", "Kpando", "Aflao", "Sogakope", "Dzodze", "Adaklu", "Afadzato South", "Agotime-Ziope", "Akatsi North", "Akatsi South", "Anloga", "Central Tongu", "Ho West", "Ketu North", "Ketu South", "North Dayi", "North Tongu", "South Dayi", "South Tongu"],
+    "Northern": ["Tamale", "Yendi", "Savelugu", "Tolon", "Kumbungu", "Nanton", "Gushegu", "Karaga", "Saboba", "Zabzugu", "Tatale-Sanguli", "Mion", "Nanumba North", "Nanumba South", "Kpandai"],
+    "North East": ["Nalerigu", "Walewale", "Gambaga", "Bunkpurugu", "Yunyoo", "Chereponi"],
+    "Upper West": ["Wa", "Lawra", "Nadowli", "Jirapa", "Lambussie", "Nandom", "Sissala East", "Sissala West", "Wa East", "Wa West", "Daffiama-Bussie-Issa"],
+    "Upper East": ["Bolgatanga", "Bawku", "Navrongo", "Zebilla", "Paga", "Binduri", "Bongo", "Builsa North", "Builsa South", "Garu", "Kassena-Nankana East", "Kassena-Nankana West", "Nabdam", "Pusiga", "Talensi", "Tempane"],
+    "Oti": ["Dambai", "Jasikan", "Kadjebi", "Krachi", "Nkwanta", "Biakoye", "Guan", "Krachi East", "Krachi Nchumuru", "Krachi West", "Nkwanta North", "Nkwanta South"],
+    "Bono": ["Sunyani", "Berekum", "Dormaa", "Wenchi", "Techiman", "Nkoranza", "Kintampo", "Atebubu", "Sene", "Pru", "Tain", "Banda", "Jaman North", "Jaman South", "Berekum East", "Berekum West", "Dormaa Central", "Dormaa East", "Dormaa West"],
+    "Bono East": ["Techiman Municipal", "Techiman North", "Nkoranza North", "Nkoranza South", "Kintampo North", "Kintampo South", "Atebubu-Amantin", "Pru East", "Pru West", "Sene East", "Sene West"],
+    "Ahafo": ["Goaso", "Bechem", "Duayaw Nkwanta", "Hwidiem", "Kenyasi", "Mim", "Asunafo North", "Asunafo South", "Asutifi North", "Asutifi South", "Tano North", "Tano South"],
+    "Savannah": ["Damongo", "Bole", "Sawla", "Salaga", "Buipe", "Daboya", "Larabanga", "Mole", "Central Gonja", "East Gonja", "North East Gonja", "North Gonja", "West Gonja", "Sawla-Tuna-Kalba"],
+    "Western": ["Sekondi-Takoradi", "Tarkwa", "Prestea", "Bogoso", "Axim", "Elubo", "Half Assini", "Ahanta West", "Effia-Kwesimintsim", "Ellembelle", "Jomoro", "Mpohor", "Nzema East", "Prestea-Huni Valley", "Shama", "Tarkwa-Nsuaem", "Wassa Amenfi Central", "Wassa Amenfi East", "Wassa Amenfi West", "Wassa East"],
+    "Western North": ["Sefwi Wiawso", "Bibiani", "Juaboso", "Bodi", "Aowin", "Bia East", "Bia West", "Bibiani-Anhwiaso-Bekwai", "Sefwi Akontombra", "Suaman"],
+    "Central": ["Cape Coast", "Winneba", "Kasoa", "Swedru", "Dunkwa", "Elmina", "Moree", "Abura-Asebu-Kwamankese", "Agona East", "Agona West", "Ajumako-Enyan-Essiam", "Asikuma-Odoben-Brakwa", "Assin Central", "Assin North", "Assin South", "Awutu Senya", "Awutu Senya East", "Effutu", "Ekumfi", "Gomoa Central", "Gomoa East", "Gomoa West", "Komenda-Edina-Eguafo-Abrem", "Mfantsiman", "Twifo-Atti Morkwa", "Twifo Hemang Lower Denkyira", "Upper Denkyira East", "Upper Denkyira West"]
+  },
+  // Sector → Industry → Job Role cascade (expanded from your Excel)
+  SECTOR_DATA: {
+    "Agriculture": {
+      "Crop Farming": ["Farm Manager", "Agronomist", "Soil Scientist", "Irrigation Specialist", "Plant Breeder", "Crop Scout", "Seed Technologist", "Precision Ag Specialist", "Agricultural Engineer", "Horticulturalist", "Entomologist", "Farm Laborer", "Tractor Operator", "Combine Operator", "Irrigation Technician", "Storekeeper", "Driver", "Security Guard", "Gardener", "Accountant", "Bookkeeper", "Farm Administrator", "Purchasing Agent", "Sales Rep", "Inventory Clerk", "HR Officer", "Compliance Officer"],
+      "Livestock": ["Ranch Manager", "Veterinary Surgeon", "Animal Nutritionist", "AI Technician", "Livestock Geneticist", "Animal Health Inspector", "Herdsman", "Poultry Attendant", "Milker", "Stable Hand", "Feed Mill Operator", "Livestock Hauler", "Security Guard", "Sanitation Crew", "Accountant", "Procurement Officer", "HR Coordinator", "Logistics Coordinator", "Sales Manager"],
+      "Aquaculture": ["Fish Farm Manager", "Marine Biologist", "Aquaculturist", "Water Quality Technician", "Fish Pathologist", "RAS Specialist", "Fisheries Ecologist", "Algae Technician", "Pond Attendant", "Cage Technician", "Net Repairer", "Fish Feeder", "Trawler Deckhand", "Aquaculture Plumber", "Security Guard", "Office Cleaner", "Accountant", "Exports Officer", "HR Generalist", "Supply Chain Officer"],
+      "Forestry": ["Forest Manager", "Forester", "Forest Ranger", "Silviculturist", "Timber Cruiser", "Log Grader", "Arborist", "Fire Management Officer", "Chainsaw Operator", "Skidder Operator", "Tree Climber", "Choker Setter", "Logging Truck Driver", "Security Guard", "Accountant", "Permitting Specialist", "HR Officer", "Land Rights Coordinator", "HSE Manager"]
+    },
+    "Non-Agriculture": {
+      "Mining & Extractive": ["Mine Manager", "Petroleum Engineer", "Reservoir Engineer", "Drilling Engineer", "Geologist", "Geophysicist", "Metallurgist", "Mine Surveyor", "Ventilation Officer", "Blasting Engineer", "Environmental Coordinator", "Roustabout", "Roughneck", "Derrickhand", "Heavy Equipment Operator", "Drill Rig Operator", "Crusher Operator", "Maintenance Mechanic", "Security Guard", "Accountant", "Procurement Manager", "HR Business Partner", "Logistics Coordinator", "Regulatory Officer"],
+      "Manufacturing": ["Factory Manager", "Production Manager", "QA Manager", "Food Technologist", "Product Developer", "Lab Technician", "QC Inspector", "Brewmaster", "Industrial Baker", "Machine Engineer", "Machine Operator", "Packaging Hand", "Warehouse Loader", "Delivery Driver", "Sanitation Worker", "Accountant", "Purchasing Officer", "Supply Chain Coordinator", "HR Officer", "Compliance Officer"],
+      "Construction": ["Project Manager", "Site Manager", "Civil Engineer", "Structural Engineer", "Quantity Surveyor", "Architect", "BIM Coordinator", "Land Surveyor", "Safety Officer", "CAD Technician", "Bricklayer", "Carpenter", "Electrician", "Plumber", "Crane Operator", "Scaffolder", "Painter", "Tipper Driver", "Site Security", "Post-Construction Cleaner", "Construction Accountant", "Contract Administrator", "Document Controller", "HR Manager", "Procurement Officer"],
+      "ICT & Digital": ["CTO", "IT Project Manager", "Product Manager", "Software Engineer", "Full-stack Developer", "Mobile Developer", "UI/UX Designer", "Data Scientist", "Cybersecurity Specialist", "Cloud Architect", "Systems Admin", "AI/ML Engineer", "Network Engineer", "IT Helpdesk", "Hardware Repairer", "Data Entry", "CCTV Installer", "Office Cleaner", "IT Accountant", "Digital Marketing Manager", "Content Strategist", "IT Recruiter", "Technical Writer"],
+      "Financial Services": ["Branch Manager", "Operations Manager", "Credit Manager", "Loan Officer", "Credit Analyst", "Relationship Manager", "Risk Officer", "Mobile Money Coordinator", "Bank Teller", "Cashier", "Bullion Driver", "Armed Security", "Office Cleaner", "Accountant", "Data Entry Clerk", "HR Officer", "Customer Service Executive"],
+      "Healthcare": ["Hospital Administrator", "Medical Director", "Nursing Superintendent", "Medical Doctor", "Registered Nurse", "Pharmacist", "Lab Scientist", "Radiographer", "Physiotherapist", "Biomedical Engineer", "Ward Assistant", "Pharmacy Technician", "Ambulance Driver", "Hospital Security", "Sanitation Officer", "Gardener", "Medical Accountant", "Records Officer", "HR Manager", "Insurance Coordinator", "Medical Secretary"],
+      "Education": ["Principal", "Registrar", "Dean", "Director of Studies", "Teacher", "Lecturer", "Curriculum Developer", "Educational Psychologist", "Librarian", "Lab Technician", "Teaching Assistant", "School Nurse", "Bus Driver", "Security Guard", "Janitor", "Gardener", "School Accountant", "Admissions Officer", "HR Manager", "Exams Officer", "School Secretary"],
+      "Hospitality & Tourism": ["Hotel GM", "Front Office Manager", "Executive Housekeeper", "F&B Manager", "Event Planner", "Revenue Manager", "Maintenance Engineer", "IT Specialist", "Front Desk", "Bellhop", "Room Attendant", "Laundry Worker", "Security", "Gardener", "Shuttle Driver", "Hotel Accountant", "Reservations Agent", "HR Manager", "Night Auditor"],
+      "Retail & Trade": ["Store Manager", "Floor Manager", "Merchandise Manager", "Branch Manager", "Regional Director", "Visual Merchandiser", "Buyer", "Pricing Analyst", "Loss Prevention", "E-commerce Specialist", "Sales Associate", "Cashier", "Shelf Stocker", "Warehouse Picker", "Delivery Driver", "Security Guard", "Store Cleaner", "Retail Accountant", "Inventory Manager", "Procurement Officer", "HR Coordinator", "Customer Service Manager"],
+      "Logistics & Transport": ["Fleet Manager", "Logistics Director", "Warehouse Manager", "Supply Chain Manager", "Port Manager", "Logistics Analyst", "Route Optimizer", "Transport Safety Officer", "WMS Admin", "Customs Broker", "Freight Forwarder", "HGV Driver", "Forklift Operator", "Courier", "Loader", "Fleet Mechanic", "Warehouse Security", "Facility Cleaner", "Logistics Accountant", "Documentation Specialist", "Dispatcher", "HR Specialist", "Cargo Coordinator"]
+    }
+  }
+};
+
+// ===== STATE =====
+let formState = {
+  collectorName: '', deviceId: '', regionCounter: {}, globalSequence: 0, isSubmitting: false, isAdmin: false
+};
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', () => {
+  initializeForm();
+  setupEventListeners();
+  updatePartnerDisplays();
+  // Check admin login
+  if (localStorage.getItem('happyAdmin') === 'true') {
+    formState.isAdmin = true;
+  }
+});
+
+function initializeForm() {
+  document.getElementById('onboardingDate').valueAsDate = new Date();
+  formState.deviceId = generateDeviceId();
+  document.getElementById('deviceId').value = formState.deviceId;
+  populateRegions();
+  const saved = localStorage.getItem('happyCollector');
+  if (saved) {
+    document.getElementById('collectorName').value = saved;
+    formState.collectorName = saved;
+  }
+  updateOnlineStatus();
+  updateIds();
+}
+
+function setupEventListeners() {
+  document.getElementById('collectorName').addEventListener('change', e => {
+    formState.collectorName = e.target.value;
+    localStorage.setItem('happyCollector', e.target.value);
+  });
+  document.getElementById('telephone').addEventListener('blur', e => validatePhone(e.target));
+  document.getElementById('ghanaCardId').addEventListener('blur', e => validateGhanaCard(e.target));
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  // Prevent form submit on Enter in non-textarea fields
+  document.getElementById('mainForm').addEventListener('keypress', e => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
+  });
+}
+
+// ===== VIEW SWITCHING =====
+function setView(view) {
+  document.getElementById('view-form').classList.toggle('hidden', view !== 'form');
+  document.getElementById('view-sheet').classList.toggle('hidden', view !== 'sheet');
+  document.getElementById('tab-form').classList.toggle('active', view === 'form');
+  document.getElementById('tab-sheet').classList.toggle('active', view === 'sheet');
+}
+
+// ===== ADMIN LOGIN =====
+function showAdminLogin() {
+  document.getElementById('adminModal').classList.remove('hidden');
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('adminPassword').focus();
+}
+function closeAdminLogin() {
+  document.getElementById('adminModal').classList.add('hidden');
+}
+function verifyAdmin() {
+  const pwd = document.getElementById('adminPassword').value;
+  if (pwd === CONFIG.ADMIN_PASSWORD) {
+    formState.isAdmin = true;
+    localStorage.setItem('happyAdmin', 'true');
+    closeAdminLogin();
+    showToast('✅ Admin access granted', 'success');
+    loadSheetData();
+    setView('sheet');
+  } else {
+    showToast('❌ Incorrect password', 'error');
+  }
+}
+
+// ===== REGION & DISTRICT LOGIC =====
+function populateRegions() {
+  const selects = ['region', 'workRegion', 'placementRegion'];
+  selects.forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    Object.keys(CONFIG.REGIONS).sort().forEach(region => {
+      const opt = document.createElement('option');
+      opt.value = region; opt.textContent = region;
+      sel.appendChild(opt.cloneNode(true));
     });
+  });
+}
+function populateDistricts(regId, distId) {
+  const region = document.getElementById(regId).value;
+  const dist = document.getElementById(distId);
+  dist.innerHTML = '<option value="">Select District</option>';
+  if (region && CONFIG.REGIONS[region]) {
+    CONFIG.REGIONS[region].sort().forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      dist.appendChild(opt);
+    });
+    dist.disabled = false;
+  } else { dist.disabled = true; }
+}
 
-    function initializeForm() {
-      document.getElementById('onboardingDate').valueAsDate = new Date();
-      formState.deviceId = generateDeviceId();
-      document.getElementById('deviceId').value = formState.deviceId;
-      populateRegions();
-      const savedCollector = localStorage.getItem('happyCollector');
-      if (savedCollector) {
-        document.getElementById('collectorName').value = savedCollector;
-        document.getElementById('collectorDisplay').textContent = savedCollector;
-        formState.collectorName = savedCollector;
-      }
-      updateOnlineStatus();
+// ===== CASCADE: Sector → Industry → Job Type → Job Role =====
+function populateIndustries() {
+  const sector = document.getElementById('sector').value;
+  const indSel = document.getElementById('industry');
+  const typeSel = document.getElementById('jobType');
+  const roleSel = document.getElementById('jobRole');
+  [indSel, typeSel, roleSel].forEach(s => { s.innerHTML = '<option value="">Select</option>'; s.disabled = true; });
+  if (sector && CONFIG.SECTOR_DATA[sector]) {
+    Object.keys(CONFIG.SECTOR_DATA[sector]).sort().forEach(ind => {
+      const opt = document.createElement('option');
+      opt.value = ind; opt.textContent = ind;
+      indSel.appendChild(opt);
+    });
+    indSel.disabled = false;
+  }
+}
+function populateJobTypes() { document.getElementById('jobType').disabled = false; }
+function populateJobRoles() {
+  const sector = document.getElementById('sector').value;
+  const industry = document.getElementById('industry').value;
+  const jobType = document.getElementById('jobType').value;
+  const roleSel = document.getElementById('jobRole');
+  roleSel.innerHTML = '<option value="">Select</option>';
+  if (sector && industry && jobType && CONFIG.SECTOR_DATA[sector]?.[industry]) {
+    CONFIG.SECTOR_DATA[sector][industry].forEach(role => {
+      const opt = document.createElement('option');
+      opt.value = role; opt.textContent = role;
+      roleSel.appendChild(opt);
+    });
+    roleSel.disabled = false;
+  }
+}
+// Placement cascade (separate selectors)
+function populatePlacementIndustries() {
+  const sector = document.getElementById('plSector').value;
+  const indSel = document.getElementById('plIndustry');
+  const typeSel = document.getElementById('plJobType');
+  const roleSel = document.getElementById('plJobRole');
+  [indSel, typeSel, roleSel].forEach(s => { s.innerHTML = '<option value="">Select</option>'; s.disabled = true; });
+  if (sector && CONFIG.SECTOR_DATA[sector]) {
+    Object.keys(CONFIG.SECTOR_DATA[sector]).sort().forEach(ind => {
+      const opt = document.createElement('option');
+      opt.value = ind; opt.textContent = ind;
+      indSel.appendChild(opt);
+    });
+    indSel.disabled = false;
+  }
+}
+function populatePlacementJobTypes() { document.getElementById('plJobType').disabled = false; }
+function populatePlacementJobRoles() {
+  const sector = document.getElementById('plSector').value;
+  const industry = document.getElementById('plIndustry').value;
+  const jobType = document.getElementById('plJobType').value;
+  const roleSel = document.getElementById('plJobRole');
+  roleSel.innerHTML = '<option value="">Select</option>';
+  if (sector && industry && jobType && CONFIG.SECTOR_DATA[sector]?.[industry]) {
+    CONFIG.SECTOR_DATA[sector][industry].forEach(role => {
+      const opt = document.createElement('option');
+      opt.value = role; opt.textContent = role;
+      roleSel.appendChild(opt);
+    });
+    roleSel.disabled = false;
+  }
+}
+
+// ===== CONDITIONAL FIELD TOGGLES =====
+function toggleRefugeeField() {
+  const show = document.getElementById('refugeeStatus').value === 'Yes';
+  document.getElementById('nationalityField').classList.toggle('hidden', !show);
+}
+function toggleDisplacementFields() {
+  const show = document.getElementById('displacementStatus').value === 'Yes';
+  ['displacementReasonField', 'originalCommunityField', 'hostCommunityField'].forEach(id => {
+    document.getElementById(id).classList.toggle('hidden', !show);
+  });
+}
+function toggleDisabilityField() {
+  const show = document.getElementById('disabilityStatus').value === 'Yes';
+  document.getElementById('disabilitySpecField').classList.toggle('hidden', !show);
+}
+function toggleCapacityFields(show) {
+  document.getElementById('capacityFields').classList.toggle('show', show);
+}
+function toggleTrainingModeFields() {
+  const mode = document.getElementById('trainingMode').value;
+  document.getElementById('virtualTrainingFields').classList.toggle('hidden', mode !== 'Virtual');
+}
+function togglePlacementFields(show) {
+  document.getElementById('placementFields').classList.toggle('show', show);
+  document.getElementById('currentEmploymentFields').classList.toggle('show', !show);
+}
+function togglePreviousTrainingDetails() {
+  const show = document.getElementById('previousTrainings').value === 'Yes';
+  document.getElementById('previousTrainingDetails').classList.toggle('hidden', !show);
+}
+function toggleCurrentEmploymentDetails() {
+  const show = document.getElementById('currentlyEmployed').value === 'Yes';
+  document.getElementById('currentEmploymentDetails').classList.toggle('hidden', !show);
+}
+
+// ===== CALCULATIONS =====
+function calculateAge() {
+  const dob = document.getElementById('dob').value;
+  if (!dob) { document.getElementById('age').value = ''; document.getElementById('participantTypeAge').value = ''; return; }
+  const birth = new Date(dob), today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  document.getElementById('age').value = age;
+  document.getElementById('participantTypeAge').value = (age >= 15 && age <= 35) ? 'Youth' : 'Non-Youth';
+}
+
+// ===== ID GENERATION =====
+function onPartnerChange() {
+  updatePartnerDisplays();
+  updateIds();
+}
+function updatePartnerDisplays() {
+  const partner = document.getElementById('implementingPartner').value || 'the implementing partner';
+  document.getElementById('partnerNameDisplay').textContent = partner;
+  document.getElementById('partnerNameDisplay2').textContent = partner;
+}
+function updateIds() {
+  const partner = document.getElementById('implementingPartner').value || 'UNK';
+  const region = document.getElementById('region').value || 'XXX';
+  const pPrefix = CONFIG.PARTNER_PREFIXES[partner] || partner.substring(0,3).toUpperCase();
+  const rPrefix = region.substring(0,3).toUpperCase();
+  const ts = new Date().toISOString().replace(/[-:T.]/g, '').substring(0,14);
+  // Submission ID
+  document.getElementById('submissionId').value = `${rPrefix}-${String(db.length+1).padStart(6,'0')}-${ts}`;
+  document.getElementById('subIdDisplay').textContent = `${rPrefix}-${String(db.length+1).padStart(6,'0')}-${ts}`;
+  // Participant ID placeholder
+  document.getElementById('participantId').placeholder = `${pPrefix}--${String(db.length+1).padStart(7,'0')} (will auto-generate)`;
+}
+function generateDeviceId() {
+  const ua = navigator.userAgent, platform = navigator.platform, lang = navigator.language;
+  const hash = `${ua}${platform}${lang}${Date.now()}`.split('').reduce((a,b) => { a = ((a<<5)-a)+b.charCodeAt(0); return a&a; }, 0);
+  return `DEV-${Math.abs(hash).toString(36).toUpperCase().substring(0,8)}`;
+}
+
+// ===== VALIDATION (INDEX5 STYLE) =====
+function validatePhone(input) {
+  const val = input.value.replace(/\D/g, '');
+  if (val && !/^0\d{9}$/.test(val)) {
+    showToast('Phone must be 10 digits starting with 0 (e.g., 0244111111)', 'error');
+    input.focus();
+    return false;
+  }
+  return true;
+}
+function validateGhanaCard(input) {
+  const val = input.value.toUpperCase();
+  // Index5 logic: GHA-XXXXXXXXX-X format (15 chars total)
+  if (val && !/^GHA-\d{9}-\d$/.test(val)) {
+    showToast('Ghana Card must be: GHA-XXXXXXXXX-X (15 chars)', 'error');
+    input.focus();
+    return false;
+  }
+  return true;
+}
+function formatGhanaCard(input) {
+  // Auto-format as user types: GHA-123456789-0
+  let val = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  if (!val.startsWith('GHA-')) val = 'GHA-' + val.replace('GHA', '');
+  if (val.length > 13 && val[13] !== '-') val = val.slice(0,13) + '-' + val.slice(13);
+  input.value = val.slice(0,15);
+}
+
+// ===== FORM SUBMISSION =====
+async function handleSubmit(e) {
+  e.preventDefault();
+  if (formState.isSubmitting) return;
+  
+  // Final validation
+  if (!validatePhone(document.getElementById('telephone'))) return;
+  const idType = document.getElementById('idType').value;
+  if (idType === 'Ghana Card' && !validateGhanaCard(document.getElementById('ghanaCardId'))) return;
+  
+  formState.isSubmitting = true;
+  const btn = document.getElementById('submitBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> Submitting...';
+  btn.disabled = true;
+  
+  try {
+    const formData = collectFormData();
+    showStatus(navigator.onLine ? '🟢 Online - Syncing...' : '🔴 Offline - Saving locally...', navigator.onLine ? 'online' : 'offline');
+    
+    const response = await fetch(CONFIG.API_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    const result = await response.json();
+    
+    if (result.status === 'OK') {
+      document.getElementById('refDisplay').textContent = result.referenceId || 'N/A';
+      document.getElementById('mainForm').classList.add('hidden');
+      document.getElementById('successScreen').classList.add('show');
+      showToast('✅ Saved to Google Sheets!', 'success');
+    } else {
+      throw new Error(result.message || 'Submission failed');
     }
+  } catch (err) {
+    console.error('Submit error:', err);
+    showToast(`Error: ${err.message}`, 'error');
+  } finally {
+    formState.isSubmitting = false;
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
 
-    function setupEventListeners() {
-      document.getElementById('collectorName').addEventListener('change', (e) => {
-        formState.collectorName = e.target.value;
-        localStorage.setItem('happyCollector', e.target.value);
-        document.getElementById('collectorDisplay').textContent = e.target.value;
-      });
-      document.getElementById('telephone').addEventListener('blur', validatePhone);
-      document.getElementById('ghanaCardId').addEventListener('blur', validateGhanaCard);
-      window.addEventListener('online', updateOnlineStatus);
-      window.addEventListener('offline', updateOnlineStatus);
-      document.getElementById('questionnaireForm').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
-      });
-    }
+function collectFormData() {
+  const region = document.getElementById('region').value;
+  const modules = Array.from(document.querySelectorAll('input[name="modules"]:checked')).map(cb => cb.value).join(', ');
+  const digitalSkills = Array.from(document.querySelectorAll('input[name="digitalSkills"]:checked')).map(cb => cb.value).join(', ');
+  const virtualModules = ''; // Placeholder if needed
+  
+  return {
+    // Section A: Meta
+    submissionId: document.getElementById('submissionId').value,
+    participantId: document.getElementById('participantId').value || generateParticipantId(),
+    collectorName: document.getElementById('collectorName').value,
+    deviceId: formState.deviceId,
+    submissionTimestamp: new Date().toISOString(),
+    
+    // Section B: General
+    hamisId: document.getElementById('hamisId').value,
+    onboardingDate: document.getElementById('onboardingDate').value,
+    implementingPartner: document.getElementById('implementingPartner').value,
+    region: region,
+    district: document.getElementById('district').value,
+    community: document.getElementById('community').value,
+    locationStatus: document.getElementById('locationStatus').value,
+    surname: document.getElementById('surname').value,
+    firstName: document.getElementById('firstName').value,
+    otherNames: document.getElementById('otherNames').value,
+    sex: document.getElementById('sex').value,
+    dob: document.getElementById('dob').value,
+    age: document.getElementById('age').value,
+    participantTypeAge: document.getElementById('participantTypeAge').value,
+    telephone: document.getElementById('telephone').value,
+    idType: document.getElementById('idType').value,
+    ghanaCardId: document.getElementById('ghanaCardId').value,
+    voterId: document.getElementById('voterId').value,
+    refugeeStatus: document.getElementById('refugeeStatus').value,
+    nationality: document.getElementById('nationality').value,
+    displacementStatus: document.getElementById('displacementStatus').value,
+    displacementReason: document.getElementById('displacementReason').value,
+    originalCommunity: document.getElementById('originalCommunity').value,
+    hostCommunity: document.getElementById('hostCommunity').value,
+    disabilityStatus: document.getElementById('disabilityStatus').value,
+    disabilitySpecify: document.getElementById('disabilitySpecify').value,
+    educationLevel: document.getElementById('educationLevel').value,
+    employmentStatus: document.getElementById('employmentStatus').value,
+    currentOccupation: document.getElementById('currentOccupation').value,
+    monthlyIncome: document.getElementById('monthlyIncome').value,
+    incomeFrequency: document.getElementById('incomeFrequency').value,
+    sector: document.getElementById('sector').value,
+    industry: document.getElementById('industry').value,
+    jobType: document.getElementById('jobType').value,
+    jobRole: document.getElementById('jobRole').value,
+    workRegion: document.getElementById('workRegion').value,
+    workDistrict: document.getElementById('workDistrict').value,
+    workCommunity: document.getElementById('workCommunity').value,
+    
+    // Section C: Capacity Building
+    trainedByPartner: document.querySelector('input[name="tr_check"]:checked')?.value || '',
+    trainingStartDate: document.getElementById('trainingStartDate').value,
+    trainingEndDate: document.getElementById('trainingEndDate').value,
+    trainingLocation: document.getElementById('trainingLocation').value,
+    trainingMode: document.getElementById('trainingMode').value,
+    virtualPlatform: document.getElementById('virtualPlatform').value,
+    trainerType: document.getElementById('trainerType').value,
+    trainingPartner: document.getElementById('trainingPartner').value,
+    completionStatus: document.getElementById('completionStatus').value,
+    certificateIssued: document.getElementById('certificateIssued').value,
+    modules: modules,
+    digitalSkills: digitalSkills,
+    wishTraining: document.getElementById('wishTraining').value,
+    previousTrainings: document.getElementById('previousTrainings').value,
+    previousTrainingDesc: document.getElementById('previousTrainingDesc').value,
+    
+    // Section D: Placement
+    placedByPartner: document.querySelector('input[name="pl_check"]:checked')?.value || '',
+    placementStartDate: document.getElementById('placementStartDate').value,
+    placementRegion: document.getElementById('placementRegion').value,
+    placementDistrict: document.getElementById('placementDistrict').value,
+    placementCommunity: document.getElementById('placementCommunity').value,
+    plSector: document.getElementById('plSector').value,
+    plIndustry: document.getElementById('plIndustry').value,
+    plJobType: document.getElementById('plJobType').value,
+    plJobRole: document.getElementById('plJobRole').value,
+    employmentType: document.getElementById('employmentType').value,
+    employmentCategory: document.getElementById('employmentCategory').value,
+    placementIncome: document.getElementById('placementIncome').value,
+    placementIncomeFreq: document.getElementById('placementIncomeFreq').value,
+    employerName: document.getElementById('employerName').value,
+    contractType: document.getElementById('contractType').value,
+    workHours: document.getElementById('workHours').value,
+    currentlyEmployed: document.getElementById('currentlyEmployed').value,
+    currentEmployer: document.getElementById('currentEmployer').value,
+    currentJobRoleAlt: document.getElementById('currentJobRoleAlt').value,
+    currentIncomeAlt: document.getElementById('currentIncomeAlt').value
+  };
+}
 
-    // ===== TAB SWITCHING =====
-    function switchTab(tab) {
-      if (tab === 'form') {
-        document.getElementById('formView').classList.remove('hidden');
-        document.getElementById('sheetView').classList.add('hidden');
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.querySelectorAll('.tab-btn')[1].classList.remove('active');
-      }
-    }
+function generateParticipantId() {
+  const partner = document.getElementById('implementingPartner').value || 'UNK';
+  const prefix = CONFIG.PARTNER_PREFIXES[partner] || partner.substring(0,3).toUpperCase();
+  return `${prefix}--${String(db.length+1).padStart(7,'0')}`;
+}
 
-    // ===== ADMIN LOGIN =====
-    function showAdminLogin() {
-      document.getElementById('adminLogin').classList.remove('hidden');
-      document.getElementById('adminPassword').value = '';
-      document.getElementById('adminPassword').focus();
-    }
+function resetForm() {
+  document.getElementById('mainForm').reset();
+  document.getElementById('mainForm').classList.remove('hidden');
+  document.getElementById('successScreen').classList.remove('show');
+  // Reset conditionals
+  ['capacityFields', 'placementFields', 'currentEmploymentFields', 'nationalityField', 'disabilitySpecField', 'virtualTrainingFields', 'previousTrainingDetails', 'currentEmploymentDetails', 'displacementReasonField', 'originalCommunityField', 'hostCommunityField'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+  // Reset disables
+  ['district', 'industry', 'jobType', 'jobRole', 'placementDistrict', 'workDistrict', 'plIndustry', 'plJobType', 'plJobRole'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  // Reset radios
+  document.querySelectorAll('input[name="tr_check"]').forEach(r => r.checked = r.value === 'No');
+  document.querySelectorAll('input[name="pl_check"]').forEach(r => r.checked = r.value === 'No');
+  // Reset dates
+  document.getElementById('onboardingDate').valueAsDate = new Date();
+  // Reset IDs
+  updateIds();
+  hideStatus();
+  formState.isSubmitting = false;
+}
 
-    function closeAdminLogin() {
-      document.getElementById('adminLogin').classList.add('hidden');
-    }
+// ===== MASTER SHEET FUNCTIONS =====
+async function loadSheetData() {
+  if (!formState.isAdmin) { showAdminLogin(); return; }
+  const status = document.getElementById('sheetBody').querySelector('td');
+  if (status) status.textContent = '🔄 Loading from Google Sheets...';
+  try {
+    // Note: Your Apps Script needs doGet to support ?action=getSheetData
+    showToast('ℹ️ Master Sheet requires backend doGet endpoint', 'info');
+    // Uncomment when backend supports it:
+    /*
+    const res = await fetch(CONFIG.API_ENDPOINT + '?action=getSheetData');
+    const data = await res.json();
+    renderSheet(data);
+    */
+  } catch (err) {
+    console.error('Sheet load error:', err);
+    showToast('❌ Failed to load data', 'error');
+  }
+}
+function renderSheet(data) {
+  const head = document.getElementById('sheetHead');
+  const body = document.getElementById('sheetBody');
+  if (!data?.length) { body.innerHTML = '<tr><td colspan="25" class="text-center py-6 text-slate-500">No data</td></tr>'; return; }
+  // Headers
+  head.innerHTML = '';
+  const trH = document.createElement('tr');
+  Object.keys(data[0]).forEach(k => { const th = document.createElement('th'); th.textContent = k; trH.appendChild(th); });
+  head.appendChild(trH);
+  // Rows
+  body.innerHTML = '';
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    Object.values(row).forEach(v => { const td = document.createElement('td'); td.textContent = v || '-'; tr.appendChild(td); });
+    body.appendChild(tr);
+  });
+}
+function exportSheetData() {
+  showToast('📥 Export requires backend support', 'info');
+}
 
-    function verifyAdmin() {
-      const password = document.getElementById('adminPassword').value;
-      if (password === CONFIG.ADMIN_PASSWORD) {
-        formState.isAdmin = true;
-        localStorage.setItem('happyAdmin', 'true');
-        closeAdminLogin();
-        showToast('✅ Admin access granted');
-        loadSheetData();
-        document.getElementById('formView').classList.add('hidden');
-        document.getElementById('sheetView').classList.remove('hidden');
-        document.querySelectorAll('.tab-btn')[0].classList.remove('active');
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-      } else {
-        showToast('❌ Incorrect password', 'error');
-      }
-    }
+// ===== UI UTILITIES =====
+function showToast(msg, type='info') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMessage').textContent = msg;
+  toast.className = `toast toast-${type}`;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+function showStatus(msg, type) {
+  const bar = document.getElementById('statusBar');
+  document.getElementById('statusText').textContent = msg;
+  bar.className = `status-bar ${type}`;
+  bar.classList.remove('hidden');
+}
+function hideStatus() { document.getElementById('statusBar').classList.add('hidden'); }
+function updateOnlineStatus() {
+  const bar = document.getElementById('statusBar');
+  const txt = document.getElementById('statusText');
+  if (navigator.onLine) { txt.textContent = '🟢 Online - Data syncs to Google Sheets'; bar.className = 'status-bar online'; }
+  else { txt.textContent = '🔴 Offline - Data saved locally, will sync when online'; bar.className = 'status-bar offline'; }
+  if (!formState.isSubmitting) setTimeout(() => bar.classList.add('hidden'), 4000);
+}
 
-    // ===== REGION & DISTRICT LOGIC =====
-    function populateRegions() {
-      const select = document.getElementById('region');
-      const placementSelect = document.getElementById('placementRegion');
-      Object.keys(CONFIG.REGIONS).sort().forEach(region => {
-        const opt = document.createElement('option');
-        opt.value = region; opt.textContent = region;
-        select.appendChild(opt.cloneNode(true));
-        placementSelect.appendChild(opt);
-      });
-    }
-
-    function populateDistricts() {
-      const region = document.getElementById('region').value;
-      const select = document.getElementById('district');
-      select.innerHTML = '<option value="">Select District</option>';
-      if (region && CONFIG.REGIONS[region]) {
-        CONFIG.REGIONS[region].sort().forEach(district => {
-          const opt = document.createElement('option');
-          opt.value = district; opt.textContent = district;
-          select.appendChild(opt);
-        });
-        select.disabled = false;
-      } else { select.disabled = true; }
-    }
-
-    function populatePlacementDistricts() {
-      const region = document.getElementById('placementRegion').value;
-      const select = document.getElementById('placementDistrict');
-      select.innerHTML = '<option value="">Select District</option>';
-      if (region && CONFIG.REGIONS[region]) {
-        CONFIG.REGIONS[region].sort().forEach(district => {
-          const opt = document.createElement('option');
-          opt.value = district; opt.textContent = district;
-          select.appendChild(opt);
-        });
-        select.disabled = false;
-      } else { select.disabled = true; }
-    }
-
-    // ===== CASCADE LOGIC: Sector → Industry → Job Type → Job Role =====
-    function populateIndustries() {
-      const sector = document.getElementById('sector').value;
-      const industrySelect = document.getElementById('industry');
-      const jobTypeSelect = document.getElementById('jobType');
-      const jobRoleSelect = document.getElementById('jobRole');
-      industrySelect.innerHTML = '<option value="">Select</option>';
-      jobTypeSelect.innerHTML = '<option value="">Select</option><option value="Management">Management</option><option value="Technical">Technical</option><option value="Administrative">Administrative</option><option value="Support">Support</option>';
-      jobRoleSelect.innerHTML = '<option value="">Select</option>';
-      jobTypeSelect.disabled = true; jobRoleSelect.disabled = true;
-      if (sector && CONFIG.SECTOR_DATA[sector]) {
-        Object.keys(CONFIG.SECTOR_DATA[sector]).sort().forEach(industry => {
-          const opt = document.createElement('option');
-          opt.value = industry; opt.textContent = industry;
-          industrySelect.appendChild(opt);
-        });
-        industrySelect.disabled = false;
-      } else { industrySelect.disabled = true; }
-    }
-
-    function populateJobTypes() { document.getElementById('jobType').disabled = false; }
-
-    function populateJobRoles() {
-      const sector = document.getElementById('sector').value;
-      const industry = document.getElementById('industry').value;
-      const jobType = document.getElementById('jobType').value;
-      const jobRoleSelect = document.getElementById('jobRole');
-      jobRoleSelect.innerHTML = '<option value="">Select</option>';
-      if (sector && industry && jobType && CONFIG.SECTOR_DATA[sector]?.[industry]) {
-        CONFIG.SECTOR_DATA[sector][industry].forEach(role => {
-          const opt = document.createElement('option');
-          opt.value = role; opt.textContent = role;
-          jobRoleSelect.appendChild(opt);
-        });
-        jobRoleSelect.disabled = false;
-      } else { jobRoleSelect.disabled = true; }
-    }
-
-    // ===== ✅ FIXED: CONDITIONAL FIELD TOGGLES =====
-    function toggleRefugeeField() {
-      const status = document.getElementById('refugeeStatus').value;
-      const field = document.getElementById('nationalityField');
-      field.classList.toggle('hidden', status !== 'Yes');
-    }
-
-    function toggleDisabilityField() {
-      const status = document.getElementById('disabilityStatus').value;
-      const field = document.getElementById('disabilitySpecField');
-      field.classList.toggle('hidden', status !== 'Yes');
-    }
-
-    function toggleCapacityFields() {
-      const trained = document.getElementById('trainedByPartner').value;
-      const fields = document.getElementById('capacityFields');
-      fields.classList.toggle('hidden', trained !== 'Yes');
-    }
-
-    // ✅ FIXED: Virtual Training Mode → Show modules/platform fields
-    function toggleTrainingModeFields() {
-      const mode = document.getElementById('trainingMode').value;
-      const virtualFields = document.getElementById('virtualTrainingFields');
-      virtualFields.classList.toggle('hidden', mode !== 'Virtual');
-    }
-
-    function togglePlacementFields() {
-      const placed = document.getElementById('placedByPartner').value;
-      const placementFields = document.getElementById('placementFields');
-      const currentEmploymentFields = document.getElementById('currentEmploymentFields');
-      if (placed === 'Yes') {
-        placementFields.classList.remove('hidden');
-        currentEmploymentFields.classList.add('hidden');
-      } else {
-        placementFields.classList.add('hidden');
-        currentEmploymentFields.classList.remove('hidden');
-      }
-    }
-
-    function togglePreviousTrainingDetails() {
-      const hasPrevious = document.getElementById('previousTrainings').value;
-      document.getElementById('previousTrainingDetails').classList.toggle('hidden', hasPrevious !== 'Yes');
-    }
-
-    function toggleCurrentEmploymentDetails() {
-      const employed = document.getElementById('currentlyEmployed').value;
-      document.getElementById('currentEmploymentDetails').classList.toggle('hidden', employed !== 'Yes');
-    }
-
-    // ===== CALCULATIONS =====
-    function calculateAge() {
-      const dob = document.getElementById('dob').value;
-      if (!dob) { document.getElementById('age').value = ''; document.getElementById('participantTypeAge').value = ''; return; }
-      const birthDate = new Date(dob); const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-      document.getElementById('age').value = age;
-      document.getElementById('participantTypeAge').value = (age >= 15 && age <= 35) ? 'Youth' : 'Non-Youth';
-    }
-
-    // ===== ID GENERATION =====
-    function onPartnerChange() {
-      const partner = document.getElementById('implementingPartner').value;
-      updatePartnerDisplays();
-      if (partner) {
-        const prefix = CONFIG.PARTNER_PREFIXES[partner] || partner.substring(0, 3).toUpperCase();
-        document.getElementById('participantId').placeholder = `${prefix}--0000001 (will be generated)`;
-      }
-    }
-
-    function updatePartnerDisplays() {
-      const partner = document.getElementById('implementingPartner').value;
-      const displayName = partner || 'the implementing partner';
-      document.getElementById('partnerNameDisplay').textContent = displayName;
-      document.getElementById('partnerNameDisplay2').textContent = displayName;
-    }
-
-    function generateSubmissionId(region) {
-      const regionPrefix = region ? region.substring(0, 3).toUpperCase() : 'XXX';
-      const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '').replace('Z', '');
-      if (!formState.regionCounter[regionPrefix]) formState.regionCounter[regionPrefix] = 0;
-      formState.regionCounter[regionPrefix]++;
-      const index = String(formState.regionCounter[regionPrefix]).padStart(6, '0');
-      return `${regionPrefix}-${index}-${timestamp}`;
-    }
-
-    function generateDeviceId() {
-      const ua = navigator.userAgent; const platform = navigator.platform; const lang = navigator.language;
-      const hash = `${ua}${platform}${lang}${Date.now()}`.split('').reduce((a, b) => {
-        a = ((a << 5) - a) + b.charCodeAt(0); return a & a;
-      }, 0);
-      return `DEV-${Math.abs(hash).toString(36).toUpperCase().substring(0, 8)}`;
-    }
-
-    // ===== VALIDATION =====
-    function validatePhone() {
-      const phone = document.getElementById('telephone').value.replace(/\D/g, '');
-      const field = document.getElementById('telephone');
-      if (phone && !/^0\d{9}$/.test(phone)) {
-        field.setCustomValidity('Phone must be 10 digits starting with 0 (e.g., 0244111111)');
-        field.reportValidity();
-      } else { field.setCustomValidity(''); }
-    }
-
-    function validateGhanaCard() {
-      const id = document.getElementById('ghanaCardId').value.replace(/\D/g, '');
-      const field = document.getElementById('ghanaCardId');
-      if (id && id.length !== 10) {
-        field.setCustomValidity('Ghana Card must contain exactly 10 digits');
-        field.reportValidity();
-      } else { field.setCustomValidity(''); }
-    }
-
-    function validateForm() {
-      const form = document.getElementById('questionnaireForm');
-      const visibleRequired = form.querySelectorAll(':not(.hidden) [required]');
-      let isValid = true;
-      visibleRequired.forEach(field => {
-        if (!field.value.trim()) { isValid = false; field.classList.add('error'); field.reportValidity(); }
-        else { field.classList.remove('error'); }
-      });
-      return isValid && form.checkValidity();
-    }
-
-    // ===== SUBMISSION TO GOOGLE SHEETS =====
-    async function submitForm() {
-      if (formState.isSubmitting) return;
-      if (!validateForm()) { showToast('Please fill all required fields', 'error'); return; }
-      
-      formState.isSubmitting = true;
-      const submitBtn = document.getElementById('submitBtn');
-      const originalBtnText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
-      submitBtn.disabled = true;
-      
-      try {
-        const formData = collectFormData();
-        showStatus(navigator.onLine ? '🟢 Online - Syncing to Google Sheets...' : '🔴 Offline - Saving locally...', navigator.onLine ? 'online' : 'offline');
-        
-        const response = await fetch(CONFIG.API_ENDPOINT, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === 'OK') {
-          document.getElementById('refDisplay').textContent = result.referenceId || 'N/A';
-          document.getElementById('questionnaireForm').classList.add('hidden');
-          document.getElementById('successMessage').classList.remove('hidden');
-          formState.isSubmitting = false;
-          showToast('✅ Data saved to Google Sheets!', 'success');
-        } else { throw new Error(result.message || 'Submission failed'); }
-      } catch (error) {
-        console.error('Submission error:', error);
-        showToast(`Error: ${error.message}`, 'error');
-        formState.isSubmitting = false;
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.disabled = false;
-      }
-    }
-
-    function collectFormData() {
-      const region = document.getElementById('region').value;
-      const timestamp = new Date().toISOString();
-      const modules = Array.from(document.querySelectorAll('input[name="modules"]:checked')).map(cb => cb.value);
-      const virtualModules = Array.from(document.querySelectorAll('input[name="virtualModules"]:checked')).map(cb => cb.value);
-      
-      return {
-        // Section A: Meta
-        submissionId: generateSubmissionId(region),
-        collectorName: document.getElementById('collectorName').value,
-        deviceId: formState.deviceId,
-        submissionTimestamp: timestamp,
-        // Section B: General
-        hamisId: document.getElementById('hamisId').value,
-        onboardingDate: document.getElementById('onboardingDate').value,
-        implementingPartner: document.getElementById('implementingPartner').value,
-        region: region,
-        district: document.getElementById('district').value,
-        community: document.getElementById('community').value,
-        locationStatus: document.getElementById('locationStatus').value,
-        surname: document.getElementById('surname').value,
-        firstName: document.getElementById('firstName').value,
-        otherNames: document.getElementById('otherNames').value,
-        sex: document.getElementById('sex').value,
-        dob: document.getElementById('dob').value,
-        age: document.getElementById('age').value,
-        participantTypeAge: document.getElementById('participantTypeAge').value,
-        telephone: document.getElementById('telephone').value,
-        idType: document.getElementById('idType').value,
-        ghanaCardId: document.getElementById('ghanaCardId').value,
-        voterId: document.getElementById('voterId').value,
-        refugeeStatus: document.getElementById('refugeeStatus').value,
-        nationality: document.getElementById('nationality').value,
-        disabilityStatus: document.getElementById('disabilityStatus').value,
-        disabilitySpecify: document.getElementById('disabilitySpecify').value,
-        educationLevel: document.getElementById('educationLevel').value,
-        employmentStatus: document.getElementById('employmentStatus').value,
-        currentOccupation: document.getElementById('currentOccupation').value,
-        monthlyIncome: document.getElementById('monthlyIncome').value,
-        incomeFrequency: document.getElementById('incomeFrequency').value,
-        // Section C: Capacity Building
-        trainedByPartner: document.getElementById('trainedByPartner').value,
-        trainingStartDate: document.getElementById('trainingStartDate').value,
-        trainingEndDate: document.getElementById('trainingEndDate').value,
-        trainingLocation: document.getElementById('trainingLocation').value,
-        trainingMode: document.getElementById('trainingMode').value,
-        virtualModules: virtualModules.join(', '),
-        virtualPlatform: document.getElementById('virtualPlatform').value,
-        trainerType: document.getElementById('trainerType').value,
-        trainingPartner: document.getElementById('trainingPartner').value,
-        completionStatus: document.getElementById('completionStatus').value,
-        certificateIssued: document.getElementById('certificateIssued').value,
-        modules: modules.join(', '),
-        wishTraining: document.getElementById('wishTraining').value,
-        previousTrainings: document.getElementById('previousTrainings').value,
-        previousTrainingDesc: document.getElementById('previousTrainingDesc').value,
-        // Section D: Placement
-        placedByPartner: document.getElementById('placedByPartner').value,
-        placementStartDate: document.getElementById('placementStartDate').value,
-        placementRegion: document.getElementById('placementRegion').value,
-        placementDistrict: document.getElementById('placementDistrict').value,
-        placementCommunity: document.getElementById('placementCommunity').value,
-        sector: document.getElementById('sector').value,
-        industry: document.getElementById('industry').value,
-        jobType: document.getElementById('jobType').value,
-        jobRole: document.getElementById('jobRole').value,
-        employmentType: document.getElementById('employmentType').value,
-        employmentCategory: document.getElementById('employmentCategory').value,
-        placementIncome: document.getElementById('placementIncome').value,
-        placementIncomeFreq: document.getElementById('placementIncomeFreq').value,
-        employerName: document.getElementById('employerName').value,
-        contractType: document.getElementById('contractType').value,
-        workHours: document.getElementById('workHours').value,
-        // Current employment (if not placed)
-        currentlyEmployed: document.getElementById('currentlyEmployed').value,
-        currentEmployer: document.getElementById('currentEmployer').value,
-        currentJobRoleAlt: document.getElementById('currentJobRoleAlt').value,
-        currentIncomeAlt: document.getElementById('currentIncomeAlt').value
-      };
-    }
-
-    function resetForm() {
-      document.getElementById('questionnaireForm').reset();
-      document.getElementById('questionnaireForm').classList.remove('hidden');
-      document.getElementById('successMessage').classList.add('hidden');
-      // Reset ALL conditional sections
-      document.getElementById('capacityFields').classList.add('hidden');
-      document.getElementById('placementFields').classList.add('hidden');
-      document.getElementById('currentEmploymentFields').classList.add('hidden');
-      document.getElementById('nationalityField').classList.add('hidden');
-      document.getElementById('disabilitySpecField').classList.add('hidden');
-      document.getElementById('virtualTrainingFields').classList.add('hidden');
-      document.getElementById('previousTrainingDetails').classList.add('hidden');
-      document.getElementById('currentEmploymentDetails').classList.add('hidden');
-      // Reset disables
-      ['district', 'industry', 'jobType', 'jobRole', 'placementDistrict'].forEach(id => {
-        document.getElementById(id).disabled = true;
-      });
-      document.getElementById('onboardingDate').valueAsDate = new Date();
-      document.getElementById('participantId').placeholder = 'Will auto-generate';
-      hideStatus();
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Submit to Google Sheet`;
-      formState.isSubmitting = false;
-    }
-
-    // ===== MASTER SHEET FUNCTIONS =====
-    async function loadSheetData() {
-      if (!formState.isAdmin) { showAdminLogin(); return; }
-      
-      const statusEl = document.getElementById('sheetStatus');
-      statusEl.textContent = '🔄 Loading from Google Sheets...';
-      
-      try {
-        // Fetch data from your Google Sheet via Apps Script doGet
-        // Note: Your Apps Script needs a doGet handler that returns sheet data
-        // For now, we'll show a message since your backend may not have this endpoint
-        statusEl.textContent = 'ℹ️ Master Sheet view requires backend doGet endpoint. Contact developer to enable.';
-        
-        // If your backend supports it, uncomment below:
-        /*
-        const response = await fetch(CONFIG.API_ENDPOINT + '?action=getSheetData');
-        const data = await response.json();
-        renderSheet(data);
-        statusEl.textContent = `✅ Loaded ${data.length} records`;
-        */
-      } catch (error) {
-        statusEl.textContent = '❌ Failed to load data';
-        console.error('Sheet load error:', error);
-      }
-    }
-
-    function renderSheet(data) {
-      const head = document.getElementById('sheetHead');
-      const body = document.getElementById('sheetBody');
-      
-      if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="20" class="text-center py-8 text-slate-500">No data found</td></tr>';
-        return;
-      }
-      
-      // Headers
-      head.innerHTML = '';
-      const headerRow = document.createElement('tr');
-      Object.keys(data[0]).forEach(key => {
-        const th = document.createElement('th');
-        th.textContent = key;
-        headerRow.appendChild(th);
-      });
-      head.appendChild(headerRow);
-      
-      // Rows
-      body.innerHTML = '';
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        Object.values(row).forEach(value => {
-          const td = document.createElement('td');
-          td.textContent = value || '-';
-          tr.appendChild(td);
-        });
-        body.appendChild(tr);
-      });
-    }
-
-    function exportSheetData() {
-      showToast('📥 Export feature requires backend support');
-      // Implementation would fetch data and create CSV download
-    }
-
-    // ===== UI UTILITIES =====
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMessage').textContent = message;
-      toast.className = `toast toast-${type}`;
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 3000);
-    }
-
-    function showStatus(message, type) {
-      const bar = document.getElementById('statusBar');
-      const text = document.getElementById('statusText');
-      text.textContent = message;
-      bar.className = `status-bar ${type}`;
-      bar.classList.remove('hidden');
-    }
-
-    function hideStatus() { document.getElementById('statusBar').classList.add('hidden'); }
-
-    function updateOnlineStatus() {
-      const bar = document.getElementById('statusBar');
-      const text = document.getElementById('statusText');
-      if (navigator.onLine) {
-        text.textContent = '🟢 Online - Data syncs to Google Sheets';
-        bar.className = 'status-bar online';
-      } else {
-        text.textContent = '🔴 Offline - Data saved locally, will sync when online';
-        bar.className = 'status-bar offline';
-      }
-      if (!formState.isSubmitting) setTimeout(() => bar.classList.add('hidden'), 4000);
-    }
-  </script>
+// Local storage fallback for demo (index5 style)
+let db = JSON.parse(localStorage.getItem('happy_db')) || [];
+</script>
 </body>
 </html>
